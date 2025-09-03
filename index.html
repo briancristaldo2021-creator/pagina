@@ -116,6 +116,33 @@
     <button onclick="registrarOLogin()">Ingresar</button>
     <p id="mensaje"></p>
 </div>
+<!-- Logo al inicio -->
+<div id="logo-container">
+    <img src="img/logo.png" alt="Logo Los LCDM" id="logo">
+</div>
+
+<style>
+  /* Contenedor del logo */
+  #logo-container {
+      position: fixed;
+      top: 20px;              /* Distancia desde arriba */
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1100;          /* Encima del overlay */
+  }
+
+  #logo {
+      max-width: 150px;       /* Tamaño máximo */
+      height: auto;
+  }
+
+  /* Responsive: reducir logo en pantallas pequeñas */
+  @media (max-width: 480px) {
+      #logo {
+          max-width: 100px;
+      }
+  }
+</style>
 
 <script>
   // Función para cerrar overlay
@@ -172,4 +199,5 @@
 
 </body>
 </html>
+
 
