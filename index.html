@@ -97,45 +97,43 @@
     margin-top: 10px;
     font-weight: bold;
   }
-</style>
-</head>
-<body>
-<!-- Logo con enlace al principio -->
-<div id="logo-container">
-    <a href="https://ibb.co/gHRdmcM" target="_blank">
-        <img src="https://i.ibb.co/781Qj0J/logo.png" alt="Logo Los LCDM" id="logo">
-    </a>
-</div>
 
-<style>
   /* Contenedor del logo */
   #logo-container {
       position: fixed;
-      top: 20px;              /* Distancia desde arriba */
+      top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 1100;          /* Encima del overlay */
+      z-index: 1100;
   }
 
   #logo {
-      max-width: 150px;       /* Tamaño máximo */
+      max-width: 150px;
       height: auto;
-      cursor: pointer;        /* Cambia cursor al pasar por encima */
+      cursor: pointer;
       transition: transform 0.3s;
   }
 
-  /* Efecto hover */
   #logo:hover {
       transform: scale(1.1);
   }
 
-  /* Responsive: reducir logo en pantallas pequeñas */
   @media (max-width: 480px) {
       #logo {
           max-width: 100px;
       }
   }
 </style>
+</head>
+<body>
+
+<!-- Logo con enlace -->
+<div id="logo-container">
+    <a href="https://ibb.co/gHRdmcM" target="_blank">
+        <img src="https://i.ibb.co/781Qj0J/logo.png" alt="Logo Los LCDM" id="logo">
+    </a>
+</div>
+
 <!-- Overlay de bienvenida -->
 <div id="bienvenida">
     <h1>¡Bienvenido al Álbum de Los LCDM!</h1>
@@ -151,36 +149,9 @@
     <button onclick="registrarOLogin()">Ingresar</button>
     <p id="mensaje"></p>
 </div>
-<!-- Logo al inicio -->
-<div id="logo-container">
-    <img src="https://ibb.co/gHRdmcM" alt="Logo Los LCDM" id="logo">
-</div>
-
-<style>
-  /* Contenedor del logo */
-  #logo-container {
-      position: fixed;
-      top: 20px;              /* Distancia desde arriba */
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1100;          /* Encima del overlay */
-  }
-
-  #logo {
-      max-width: 150px;       /* Tamaño máximo */
-      height: auto;
-  }
-
-  /* Responsive: reducir logo en pantallas pequeñas */
-  @media (max-width: 480px) {
-      #logo {
-          max-width: 100px;
-      }
-  }
-</style>
 
 <script>
-  // Función para cerrar overlay
+  // Cerrar overlay
   function cerrarBienvenida() {
     const overlay = document.getElementById('bienvenida');
     overlay.style.opacity = 0;
@@ -190,7 +161,7 @@
     }, 1500);
   }
 
-  // Función de registro/login
+  // Registro / Login
   function registrarOLogin() {
     const usuario = document.getElementById('usuario').value.trim();
     const password = document.getElementById('password').value.trim();
@@ -213,7 +184,7 @@
         mensaje.style.color = "green";
         localStorage.setItem('usuarioActivo', usuario);
         setTimeout(() => {
-          window.location.href = 'lcdm.html'; // Página del álbum
+          window.location.href = 'lcdm.html';
         }, 1000);
       } else {
         mensaje.textContent = "Contraseña incorrecta";
@@ -225,15 +196,7 @@
       mensaje.textContent = "Registro exitoso!";
       mensaje.style.color = "green";
       localStorage.setItem('usuarioActivo', usuario);
-      setTimeout(() => {
-        window.location.href = 'lcdm.html';
-      }, 1000);
-    }
-  }
-</script>
-
-</body>
-</html>
+      setTimeout(()
 
 
 
