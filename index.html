@@ -100,7 +100,42 @@
 </style>
 </head>
 <body>
+<!-- Logo con enlace al principio -->
+<div id="logo-container">
+    <a href="https://ibb.co/gHRdmcM" target="_blank">
+        <img src="https://i.ibb.co/781Qj0J/logo.png" alt="Logo Los LCDM" id="logo">
+    </a>
+</div>
 
+<style>
+  /* Contenedor del logo */
+  #logo-container {
+      position: fixed;
+      top: 20px;              /* Distancia desde arriba */
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1100;          /* Encima del overlay */
+  }
+
+  #logo {
+      max-width: 150px;       /* Tamaño máximo */
+      height: auto;
+      cursor: pointer;        /* Cambia cursor al pasar por encima */
+      transition: transform 0.3s;
+  }
+
+  /* Efecto hover */
+  #logo:hover {
+      transform: scale(1.1);
+  }
+
+  /* Responsive: reducir logo en pantallas pequeñas */
+  @media (max-width: 480px) {
+      #logo {
+          max-width: 100px;
+      }
+  }
+</style>
 <!-- Overlay de bienvenida -->
 <div id="bienvenida">
     <h1>¡Bienvenido al Álbum de Los LCDM!</h1>
@@ -199,6 +234,7 @@
 
 </body>
 </html>
+
 
 
 
