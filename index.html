@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>Registro de Usuario</h1>
+<form id="registroForm">
+    <input type="text" id="usuario" placeholder="Usuario" required>
+    <input type="password" id="password" placeholder="Contraseña" required>
+    <button type="submit">Registrarse</button>
+</form>
+<p id="mensaje"></p>
+
+<script>
+const form = document.getElementById('registroForm');
+const mensaje = document.getElementById('mensaje');
+
+form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const usuario = document.getElementById('usuario').value;
+    const password = document.getElementById('password').value;
+
+    // Revisar si el usuario ya existe
+    if(localStorage.getItem('user_' + usuario)) {
+        mensaje.textContent = "Usuario ya registrado";
+        mensaje.style.color = "red";
+        return;
+    }
+
+    // Guardar usuario y contraseña en LocalStorage
+    const datosUsuario = {usuario, password};
+    localStorage.setItem('user_' + usuario, JSON.stringify(datosUsuario));
+
+    mensaje.textContent = "Registro exitoso!";
+    mensaje.style.color = "green";
+
+    // Opcional: redirigir al login
+    setTimeout(() => {
+        window.location.href = 'index.html';
+    }, 1500);
+});
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>Login</h1>
+<form id="loginForm">
+    <input type="text" id="usuarioLogin" placeholder="Usuario" required>
+    <input type="password" id="passwordLogin" placeholder="Contraseña" required>
+    <button type="submit">Ingresar</button>
+</form>
+<p id="mensajeLogin"></p>
+
+<script>
+const loginForm = document.getElementById('loginForm');
+const mensajeLogin = document.getElementById('mensajeLogin');
+
+loginForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const usuario = document.getElementById('usuarioLogin').value;
+    const password = document.getElementById('passwordLogin').value;
+
+    const datosGuardados = localStorage.getItem('user_' + usuario);
+    if(!datosGuardados) {
+        mensajeLogin.textContent = "Usuario no registrado";
+        mensajeLogin.style.color = "red";
+        return;
+    }
+
+    const userObj = JSON.parse(datosGuardados);
+    if(userObj.password === password) {
+        mensajeLogin.textContent = "Login exitoso!";
+        mensajeLogin.style.color = "green";
+
+        // Guardar usuario activo y redirigir a tu álbum
+        localStorage.setItem('usuarioActivo', usuario);
+        setTimeout(() => {
+            window.location.href = 'album.html'; // tu página de álbum
+        }, 1000);
+    } else {
+        mensajeLogin.textContent = "Contraseña incorrecta";
+        mensajeLogin.style.color = "red";
+    }
+});
+</script>
+</body>
+</html>
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Álbum Virtual Completo</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a href="https://github.com/briancristaldo2021-creator/lcdm1.git" target="_blank">Abrir Álbum Digital</a>
+<iframe src="https://github.com/briancristaldo2021-creator/lcdm1.git" 
+        width="100%" 
+        height="600px" 
+        style="border:none;">
+</iframe>
+	
+
+<!-- Bienvenida -->
+	<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Álbum Digital</title>
+<style>
+    /* Reset básico */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #0d0d0d;
+        color: #00ffff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        text-align: center;
+        margin-bottom: 30px;
+        text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+    }
+
+    .album-container {
+        width: 95%;
+        max-width: 1200px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 0 20px #00ffff;
+        transition: transform 0.3s;
+    }
+
+    .album-container:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 40px #00ffff;
+    }
+
+    iframe {
+        width: 100%;
+        height: 650px;
+        border: none;
+    }
+
+    .open-link {
+        margin-top: 25px;
+        padding: 14px 28px;
+        background: linear-gradient(90deg, #00ffff, #009999);
+        color: #0d0d0d;
+        font-weight: bold;
+        text-decoration: none;
+        border-radius: 8px;
+        box-shadow: 0 0 15px #00ffff;
+        transition: all 0.3s;
+    }
+
+    .open-link:hover {
+        background: linear-gradient(90deg, #009999, #00ffff);
+        box-shadow: 0 0 25px #00ffff;
+        color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        h1 { font-size: 2rem; }
+        iframe { height: 500px; }
+        .open-link { padding: 12px 24px; font-size: 0.9rem; }
+    }
+
+    @media (max-width: 480px) {
+        iframe { height: 400px; }
+        h1 { font-size: 1.6rem; }
+    }
+</style>
+</head>
+<body>
+
+<h1>Mi Álbum Digital</h1>
+
+<div class="album-container">
+    <!-- Cambia el enlace por tu GitHub Pages -->
+    <iframe src="https://briancristaldo2021-creator.github.io/lcdm1/"></iframe>
+</div>
+
+<a class="open-link" href="https://briancristaldo2021-creator.github.io/lcdm1/" target="_blank">
+    Abrir Álbum en Nueva Pestaña
+</a>
+
+</body>
+</html>
+
+<div id="bienvenida">
+    <h1>¡Bienvenido al Álbum Virtual!</h1>
+    <p>Registrate o inicia sesión para comenzar.</p>
+    <button onclick="cerrarBienvenida()">Comenzar</button>
+</div>
+
+<!-- Registro / Login -->
+<div id="login">
+    <h2>Registro / Login</h2>
+    <input type="text" id="usuario" placeholder="Nombre de usuario">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button onclick="registrarOLogin()">Ingresar</button>
+    <p>Si no existís, se creará una cuenta automáticamente.</p>
+</div>
+
+<!-- Álbum -->
+<div id="album-container">
+    <h2>Mi Álbum</h2>
+    <div id="progreso">
+        <p id="progreso-text">Progreso: 0/6 figuritas</p>
+        <div class="barra"><div class="llenado" id="barra-llenado"></div></div>
+    </div>
+    <div id="album">
+        <div class="figurita bloqueada" id="fig1" onclick="desbloquearFigurita('fig1')"></div>
+        <div class="figurita bloqueada" id="fig2" onclick="desbloquearFigurita('fig2')"></div>
+        <div class="figurita bloqueada" id="fig3" onclick="desbloquearFigurita('fig3')"></div>
+        <div class="figurita bloqueada" id="fig4" onclick="desbloquearFigurita('fig4')"></div>
+        <div class="figurita bloqueada" id="fig5" onclick="desbloquearFigurita('fig5')"></div>
+        <div class="figurita bloqueada" id="fig6" onclick="desbloquearFigurita('fig6')"></div>
+    </div>
+</div>
+	
+
+<script src="script.js"></script>
+</body>
+</html>

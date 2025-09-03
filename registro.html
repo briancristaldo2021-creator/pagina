@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro</title>
+<link rel="stylesheet" href="style.css">
+<script src="script.js" defer></script>
+</head>
+<body>
+
+<h1>Registro de Usuario</h1>
+<form id="registroForm">
+    <input type="text" id="usuario" placeholder="Usuario" required>
+    <input type="password" id="password" placeholder="Contraseña" required>
+    <button type="submit">Registrarse</button>
+</form>
+<p id="mensaje"></p>
+<p>¿Ya tenés cuenta? <a href="index.html">Login</a></p>
+
+<script>
+const form = document.getElementById('registroForm');
+const mensaje = document.getElementById('mensaje');
+
+form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const usuario = document.getElementById('usuario').value;
+    const password = document.getElementById('password').value;
+
+    if(registrarUsuario(usuario, password)) {
+        mensaje.textContent = "Registro exitoso!";
+        mensaje.style.color = "green";
+        setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+    } else {
+        mensaje.textContent = "Usuario ya registrado";
+        mensaje.style.color = "red";
+    }
+});
+</script>
+
+</body>
+</html>
