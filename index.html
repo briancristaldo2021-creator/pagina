@@ -127,12 +127,6 @@
 </head>
 <body>
 
-<!-- Logo con enlace -->
-<div id="logo-container">
-    <a href="https://ibb.co/gHRdmcM" target="_blank">
-        <img src="https://i.ibb.co/781Qj0J/logo.png" alt="Logo Los LCDM" id="logo">
-    </a>
-</div>
 
 <!-- Overlay de bienvenida -->
 <div id="bienvenida">
@@ -161,6 +155,12 @@
     }, 1500);
   }
 
+<!-- Logo con enlace -->
+<div id="logo-container">
+    <a href="https://ibb.co/gHRdmcM" target="_blank">
+        <img src="https://i.ibb.co/781Qj0J/logo.png" alt="Logo Los LCDM" id="logo">
+    </a>
+</div>
   // Registro / Login
   function registrarOLogin() {
     const usuario = document.getElementById('usuario').value.trim();
@@ -197,6 +197,7 @@
       mensaje.style.color = "green";
       localStorage.setItem('usuarioActivo', usuario);
       setTimeout(()
+
 
 
 
