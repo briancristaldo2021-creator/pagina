@@ -71,3 +71,45 @@ document.getElementById('usuario').addEventListener('keypress', function(e) {
         registrarOLogin();
     }
 });
+            // ==========================================
+// Registro de Usuario
+// ==========================================
+const registroForm = document.getElementById('registroForm');
+const mensaje = document.getElementById('mensaje');
+
+registroForm.addEventListener('submit', function(e) {
+    e.preventDefault(); // Evita que se recargue la página
+
+    const usuario = document.getElementById('usuario').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if (!usuario || !password) {
+        mensaje.textContent = "Completa todos los campos";
+        mensaje.style.color = "red";
+        return;
+    }
+
+    const key = 'user_' + usuario;
+    if (localStorage.getItem(key)) {
+        mensaje.textContent = "Usuario ya registrado";
+        mensaje.style.color = "red";
+        return;
+    }
+
+    // Guardar usuario y contraseña en LocalStorage
+    const datosUsuario = { usuario, password };
+    localStorage.setItem(key, JSON.stringify(datosUsuario));
+
+    mensaje.textContent = "Registro exitoso!";
+    mensaje.style.color = "green";
+
+    // Guardar usuario activo y redirigir al login
+    localStorage.setItem('usuarioActivo', usuario);
+    setTimeout(() => {
+        window.location.href = 'login.html'; // Página de login
+    }, 1500);
+});
+
+// =========================================
+
+
