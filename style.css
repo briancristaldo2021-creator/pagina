@@ -1,107 +1,73 @@
-/* Reset y estilos generales */
-* { margin:0; padding:0; box-sizing:border-box; }
-
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #0d0d0d;
-    color: #00ffff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
+// ==========================================
+// Overlay de Bienvenida
+// ==========================================
+function cerrarBienvenida() {
+    const overlay = document.getElementById('bienvenida');
+    overlay.style.opacity = 0; // Efecto de fade-out
+    setTimeout(() => {
+        overlay.style.display = 'none';
+        document.getElementById('login-container').style.display = 'flex'; // Mostrar login
+    }, 1500); // Tiempo debe coincidir con la transición de CSS
 }
 
-h1 {
-    font-size: 2rem;
-    margin-bottom: 20px;
-    text-align: center;
-    text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+// ==========================================
+// Registro y Login
+// ==========================================
+function registrarOLogin() {
+    const usuario = document.getElementById('usuario').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const mensaje = document.getElementById('mensaje');
+
+    // Validar campos vacíos
+    if(!usuario || !password) {
+        mensaje.textContent = "Completa todos los campos";
+        mensaje.style.color = "red";
+        return;
+    }
+
+    const key = 'user_' + usuario;
+    const datosGuardados = localStorage.getItem(key);
+
+    if(datosGuardados) {
+        // Login existente
+        const userObj = JSON.parse(datosGuardados);
+        if(userObj.password === password) {
+            mensaje.textContent = "Login exitoso!";
+            mensaje.style.color = "green";
+
+            // Guardar usuario activo y redirigir
+            localStorage.setItem('usuarioActivo', usuario);
+            setTimeout(() => {
+                window.location.href = 'lcdm.html'; // Página del álbum
+            }, 1000);
+        } else {
+            mensaje.textContent = "Contraseña incorrecta";
+            mensaje.style.color = "red";
+        }
+    } else {
+        // Registro automático
+        localStorage.setItem(key, JSON.stringify({usuario, password}));
+        mensaje.textContent = "Registro exitoso!";
+        mensaje.style.color = "green";
+
+        // Guardar usuario activo y redirigir
+        localStorage.setItem('usuarioActivo', usuario);
+        setTimeout(() => {
+            window.location.href = 'lcdm.html';
+        }, 1000);
+    }
 }
 
-form {
-    display: flex;
-    flex-direction: column;
-    width: 90%;
-    max-width: 400px;
-    margin-bottom: 20px;
-}
-
-input {
-    padding: 10px;
-    margin-bottom: 15px;
-    border-radius: 6px;
-    border: none;
-    outline: none;
-    font-size: 1rem;
-}
-
-button {
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    background-color: #00ffff;
-    color: #0d0d0d;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-button:hover {
-    background-color: #009999;
-    color: white;
-}
-
-p {
-    text-align: center;
-    margin-top: 10px;
-}
-
-.album-container {
-    width: 95%;
-    max-width: 1200px;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 0 20px #00ffff;
-    margin-top: 20px;
-}
-
-.album-container:hover {
-    transform: scale(1.02);
-    box-shadow: 0 0 40px #00ffff;
-}
-
-iframe {
-    width: 100%;
-    height: 600px;
-    border: none;
-}
-
-.open-link {
-    margin-top: 20px;
-    padding: 14px 28px;
-    background: linear-gradient(90deg, #00ffff, #009999);
-    color: #0d0d0d;
-    font-weight: bold;
-    text-decoration: none;
-    border-radius: 8px;
-    box-shadow: 0 0 15px #00ffff;
-    transition: all 0.3s;
-}
-
-.open-link:hover {
-    background: linear-gradient(90deg, #009999, #00ffff);
-    box-shadow: 0 0 25px #00ffff;
-    color: white;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    h1 { font-size: 1.8rem; }
-    iframe { height: 500px; }
-}
-
-@media (max-width: 480px) {
-    h1 { font-size: 1.5rem; }
-    iframe { height: 400px; }
-}
+// ==========================================
+// Evento Enter para login/registro
+// ==========================================
+document.getElementById('password').addEventListener('keypress', function(e) {
+    if(e.key === 'Enter') {
+        registrarOLogin();
+    }
+});
+document.getElementById('usuario').addEventListener('keypress', function(e) {
+    if(e.key === 'Enter') {
+        registrarOLogin();
+    }
+});
