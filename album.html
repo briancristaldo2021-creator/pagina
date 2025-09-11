@@ -4,68 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Álbum de Los LCDM</title>
-<style>
-  body { font-family:'Arial', sans-serif; background:#0d0d0d; color:#00ffff; display:flex; flex-direction:column; align-items:center; min-height:100vh; }
-  #contador { margin-top:20px; font-size:1.2rem; font-weight:bold; }
-  #album { display:flex; flex-wrap:wrap; justify-content:center; margin-top:20px; gap:20px; width:90%; max-width:800px; }
-  .figurita { background:#111; border-radius:8px; padding:10px; box-shadow:0 0 10px #00ffff; text-align:center; transition: transform 0.5s; }
-  .figurita img { width:120px; border-radius:6px; margin-bottom:5px; }
-  .coleccionada { border:3px solid green; transform:scale(1.1); }
-  #reiniciar { margin-top:15px; padding:8px 16px; border:none; border-radius:6px; background:#ff00ff; color:#0d0d0d; cursor:pointer; font-weight:bold; transition:all 0.3s; }
-  #reiniciar:hover { background:#990099; color:white; }
-  #premio { display:none; margin-top:20px; padding:20px; background:#00ffff; color:#0d0d0d; font-size:1.5rem; border-radius:12px; font-weight:bold; box-shadow:0 0 20px #00ffff; text-align:center; animation:pulse 1s infinite alternate; }
-  @keyframes pulse { from { transform:scale(1); } to { transform:scale(1.1); } }
-</style>
+<link rel="stylesheet" href="style.css">
+<script src="qr.js" defer></script>
+<script src="script.js" defer></script>
 </head>
 <body>
 
 <h1>Álbum de Figuritas</h1>
+	<div id="barraProgreso">
+  <div id="progreso" style="width:0%; height:20px; background:#00ffff; border-radius:10px;"></div>
+</div>
+
 <div id="contador"></div>
 <div id="album"></div>
 <button id="reiniciar" onclick="reiniciarAlbum()">Reiniciar Colección</button>
 <div id="premio">🎉 ¡Completaste el álbum! Reclama tu premio 🎉</div>
 
 <script>
-const figuritasDisponibles=[
-  {id:1,img:"https://i.ibb.co/2W5CjJ2/fig1.png"},
-  {id:2,img:"https://i.ibb.co/L9b9p0n/fig2.png"},
-  {id:3,img:"https://i.ibb.co/0rZt6pz/fig3.png"},
-  {id:4,img:"https://i.ibb.co/1Xf5NfD/fig4.png"},
-  {id:5,img:"https://i.ibb.co/v3sNw5G/fig5.png"}
-];
-
-function mostrarAlbum(){
-  const usuario=localStorage.getItem('usuarioActivo');
-  if(!usuario) { alert("Debes iniciar sesión"); window.location.href="index.html"; return; }
-
-  const datos=JSON.parse(localStorage.getItem('user_'+usuario));
-  const album=document.getElementById('album');
-  album.innerHTML='';
-
-  figuritasDisponibles.forEach(f=>{
-    const div=document.createElement('div');
-    div.classList.add('figurita');
-    if(datos.figuritas.includes(f.id)) div.classList.add('coleccionada');
-    div.innerHTML=`<img src="${f.img}" alt="Figurita ${f.id}"><p>Figurita ${f.id}</p>`;
-    album.appendChild(div);
-  });
-
-  document.getElementById('contador').textContent=`Figuritas coleccionadas: ${datos.figuritas.length}/5`;
-  document.getElementById('premio').style.display=(datos.figuritas.length===5)?'block':'none';
-}
-
-function reiniciarAlbum(){
-  const usuario=localStorage.getItem('usuarioActivo');
-  if(!usuario) return;
-  const datos=JSON.parse(localStorage.getItem('user_'+usuario));
-  datos.figuritas=[];
-  localStorage.setItem('user_'+usuario,JSON.stringify(datos));
+window.onload = function(){
   mostrarAlbum();
+  agregarFiguritaDesdeQR(); // Detecta QR si viene en la URL
 }
-
-window.onload=function(){ mostrarAlbum(); agregarFiguritaDesdeQR(); }
 </script>
 
-<script src="qr.js"></script>
 </body>
 </html>

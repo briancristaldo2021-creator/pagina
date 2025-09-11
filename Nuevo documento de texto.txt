@@ -1,0 +1,8 @@
+‌index
+album
+lcdm
+registro
+carpeta img 
+qr.js
+script.js
+style.ccs
