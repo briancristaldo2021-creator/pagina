@@ -1,3 +1,8 @@
+// ==========================================
+// DetecciÛn de QR con Html5Qrcode
+// ==========================================
+
+// Figuritas vinculadas a QR
 const codigosQR = {
     "fig1": 1,
     "fig2": 2,
@@ -6,41 +11,33 @@ const codigosQR = {
     "fig5": 5
 };
 
-document.getElementById("btnScanQR").addEventListener("click", () => {
-    iniciarScanner();
-});
-
 function iniciarScanner() {
     const qrReader = new Html5Qrcode("qr-reader");
 
     qrReader.start(
-        { facingMode: { ideal: "environment" } }, // intenta usar trasera
+        { facingMode: "environment" }, // c·mara trasera en celular
         { fps: 10, qrbox: 250 },
         qrCodeMessage => {
             procesarQR(qrCodeMessage);
             qrReader.stop();
-            document.getElementById('qr-reader').innerHTML = "<p>QR escaneado ‚úî</p>";
+            document.getElementById('qr-reader').innerHTML = "<p>QR escaneado ?</p>";
         },
         errorMessage => {
-            // ignorar errores de lectura moment√°nea
+            // errores normales de escaneo
         }
     ).catch(err => {
-        // Si falla la trasera, usa la frontal
-        qrReader.start(
-            { facingMode: "user" },
-            { fps:10, qrbox:250 },
-            qrCodeMessage => {
-                procesarQR(qrCodeMessage);
-                qrReader.stop();
-                document.getElementById('qr-reader').innerHTML = "<p>QR escaneado ‚úî</p>";
-            }
-        ).catch(e => alert("No se pudo acceder a la c√°mara. Usa celular o revisa permisos."));
+        console.error("Error al iniciar QR: ", err);
+        alert("No se pudo iniciar la c·mara ??");
     });
 }
 
 function procesarQR(qrCodeMessage) {
     const usuario = localStorage.getItem('usuarioActivo');
-    if (!usuario) { alert("Debes iniciar sesi√≥n."); return; }
+    if (!usuario) {
+        alert("Debes iniciar sesiÛn.");
+        window.location.href = "index.html";
+        return;
+    }
 
     const datos = JSON.parse(localStorage.getItem('user_' + usuario));
     let figuritaId = null;
@@ -52,15 +49,18 @@ function procesarQR(qrCodeMessage) {
         }
     }
 
-    if (!figuritaId) { alert("QR inv√°lido ‚ùå"); return; }
+    if (!figuritaId) {
+        alert("QR inv·lido ?");
+        return;
+    }
 
     if (!datos.figuritas.includes(figuritaId)) {
         datos.figuritas.push(figuritaId);
         localStorage.setItem('user_' + usuario, JSON.stringify(datos));
-        alert(`¬°Felicitaciones! Obtuviste la figurita ${figuritaId} üéâ`);
+        alert(`°Felicitaciones! Obtuviste la figurita ${figuritaId} ??`);
     } else {
-        alert("Ya tienes esta figurita üìå");
+        alert("Ya tienes esta figurita ??");
     }
 
-    mostrarAlbum(); // actualizar √°lbum
+    mostrarAlbum();
 }

@@ -5,20 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Álbum de Los LCDM</title>
 <link rel="stylesheet" href="style.css">
-<style>
-  /* Estilo rápido para el botón QR */
-  #btnScanQR {
-      background:#ff00ff;
-      color:#0d0d0d;
-      border:none;
-      padding:8px 16px;
-      border-radius:6px;
-      cursor:pointer;
-      font-weight:bold;
-      transition:all 0.3s;
-  }
-  #btnScanQR:hover { background:#990099; color:white; }
-</style>
 </head>
 <body>
 
@@ -49,40 +35,15 @@
     </div>
 </div>
 
-<!-- Botón para escanear QR -->
+<!-- Escaneo QR -->
 <div class="qr-section">
-    <button id="btnScanQR">📷 Escanear QR</button>
-    <div id="qr-reader" style="width:300px; margin-top:10px;"></div>
+    <div id="qr-reader" style="width:300px; margin:20px auto;"></div>
+    <button onclick="iniciarScanner()">📷 Escanear QR</button>
 </div>
 
-<!-- Librería HTML5 QR -->
-<script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
-
 <!-- Scripts -->
+<script src="https://unpkg.com/html5-qrcode"></script>
 <script src="qr.js"></script>
 <script src="script.js"></script>
-<script>
-  // Mostrar usuario activo
-  const usuarioActivo = localStorage.getItem('usuarioActivo');
-  if(!usuarioActivo) window.location.href='index.html';
-  document.getElementById('usuarioActivo').textContent = usuarioActivo;
-
-  // Botón cerrar sesión
-  document.getElementById('btnLogout').addEventListener('click', () => {
-      localStorage.removeItem('usuarioActivo');
-      window.location.href = 'index.html';
-  });
-
-  // Botón reiniciar álbum
-  document.getElementById('btnReiniciar').addEventListener('click', () => {
-      const datos = JSON.parse(localStorage.getItem('user_'+usuarioActivo));
-      datos.figuritas = [];
-      localStorage.setItem('user_'+usuarioActivo, JSON.stringify(datos));
-      mostrarAlbum();
-  });
-
-  // Inicializar álbum
-  mostrarAlbum();
-</script>
 </body>
 </html>
