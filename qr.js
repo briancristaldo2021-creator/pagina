@@ -1,47 +1,19 @@
-// Registro de usuario
-function registrarUsuario(usuario, password) {
-    if(localStorage.getItem('user_' + usuario)) return false; // ya existe
-    const userObj = {usuario, password};
-    localStorage.setItem('user_' + usuario, JSON.stringify(userObj));
-    return true;
-}
+function agregarFiguritaDesdeQR(){
+  const params=new URLSearchParams(window.location.search);
+  const id=parseInt(params.get('figurita'));
+  if(!id) return;
 
-// Login de usuario
-function loginUsuario(usuario, password) {
-    const datos = localStorage.getItem('user_' + usuario);
-    if(!datos) return false; // no existe usuario
-    const userObj = JSON.parse(datos);
-    if(userObj.password === password) {
-        localStorage.setItem('usuarioActivo', usuario);
-        return true;
-    }
-    return false; // contraseña incorrecta
-}
+  const usuario=localStorage.getItem('usuarioActivo');
+  if(!usuario){ alert("Debes iniciar sesión para escanear la figurita."); return; }
 
-// Obtener usuario activo
-function obtenerUsuarioActivo() {
-    return localStorage.getItem('usuarioActivo');
-}
+  const key='user_'+usuario;
+  const datos=JSON.parse(localStorage.getItem(key));
 
-// Cerrar sesión
-function logout() {
-    localStorage.removeItem('usuarioActivo');
-    window.location.href = 'index.html';
-}
+  if(!datos.figuritas.includes(id)){
+    datos.figuritas.push(id);
+    localStorage.setItem(key,JSON.stringify(datos));
+    alert(`¡Figurita ${id} agregada a tu colección!`);
+  }
 
-// Guardar última foto vista en el álbum
-function guardarFotoActual(fotoId) {
-    const usuario = obtenerUsuarioActivo();
-    if(usuario) {
-        localStorage.setItem('ultimaFoto_' + usuario, fotoId);
-    }
-}
-
-// Cargar última foto vista
-function cargarUltimaFoto() {
-    const usuario = obtenerUsuarioActivo();
-    if(usuario) {
-        return localStorage.getItem('ultimaFoto_' + usuario);
-    }
-    return null;
+  mostrarAlbum();
 }
