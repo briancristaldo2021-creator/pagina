@@ -1,43 +1,66 @@
-function agregarFiguritaDesdeQR(){
-  const params = new URLSearchParams(window.location.search);
-  const id = parseInt(params.get('figurita'));
-  if(!id) return;
+const codigosQR = {
+    "fig1": 1,
+    "fig2": 2,
+    "fig3": 3,
+    "fig4": 4,
+    "fig5": 5
+};
 
-  const usuario = localStorage.getItem('usuarioActivo');
-  if(!usuario){ alert("Debes iniciar sesión para escanear la figurita."); return; }
+document.getElementById("btnScanQR").addEventListener("click", () => {
+    iniciarScanner();
+});
 
-  const key = 'user_' + usuario;
-  const datos = JSON.parse(localStorage.getItem(key));
+function iniciarScanner() {
+    const qrReader = new Html5Qrcode("qr-reader");
 
-  if(!datos.figuritas.includes(id)){
-    datos.figuritas.push(id);
-    localStorage.setItem(key, JSON.stringify(datos));
-    alert(`¡Figurita ${id} agregada a tu colección!`);
-  }
-
-  mostrarAlbum();
+    qrReader.start(
+        { facingMode: { ideal: "environment" } }, // intenta usar trasera
+        { fps: 10, qrbox: 250 },
+        qrCodeMessage => {
+            procesarQR(qrCodeMessage);
+            qrReader.stop();
+            document.getElementById('qr-reader').innerHTML = "<p>QR escaneado ✔</p>";
+        },
+        errorMessage => {
+            // ignorar errores de lectura momentánea
+        }
+    ).catch(err => {
+        // Si falla la trasera, usa la frontal
+        qrReader.start(
+            { facingMode: "user" },
+            { fps:10, qrbox:250 },
+            qrCodeMessage => {
+                procesarQR(qrCodeMessage);
+                qrReader.stop();
+                document.getElementById('qr-reader').innerHTML = "<p>QR escaneado ✔</p>";
+            }
+        ).catch(e => alert("No se pudo acceder a la cámara. Usa celular o revisa permisos."));
+    });
 }
-function agregarFiguritaDesdeQR(){
-  const params = new URLSearchParams(window.location.search);
-  const id = parseInt(params.get('figurita'));
-  if(!id) return;
 
-  const usuario = localStorage.getItem('usuarioActivo');
-  if(!usuario){ alert("Debes iniciar sesión para escanear la figurita."); return; }
+function procesarQR(qrCodeMessage) {
+    const usuario = localStorage.getItem('usuarioActivo');
+    if (!usuario) { alert("Debes iniciar sesión."); return; }
 
-  const key = 'user_' + usuario;
-  const datos = JSON.parse(localStorage.getItem(key));
+    const datos = JSON.parse(localStorage.getItem('user_' + usuario));
+    let figuritaId = null;
 
-  if(!datos.figuritas.includes(id)){
-    datos.figuritas.push(id);
-    localStorage.setItem(key, JSON.stringify(datos));
+    for (const [clave, id] of Object.entries(codigosQR)) {
+        if (qrCodeMessage.includes(clave)) {
+            figuritaId = id;
+            break;
+        }
+    }
 
-    // Animación visual
-    const divFig = document.querySelector(`.figurita:nth-child(${id})`);
-    if(divFig) divFig.classList.add('nueva');
+    if (!figuritaId) { alert("QR inválido ❌"); return; }
 
-    alert(`¡Figurita ${id} agregada a tu colección!`);
-  }
+    if (!datos.figuritas.includes(figuritaId)) {
+        datos.figuritas.push(figuritaId);
+        localStorage.setItem('user_' + usuario, JSON.stringify(datos));
+        alert(`¡Felicitaciones! Obtuviste la figurita ${figuritaId} 🎉`);
+    } else {
+        alert("Ya tienes esta figurita 📌");
+    }
 
-  mostrarAlbum(); // Actualiza contador y premio
+    mostrarAlbum(); // actualizar álbum
 }
