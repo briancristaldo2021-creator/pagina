@@ -5,27 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Álbum de Los LCDM</title>
 <link rel="stylesheet" href="style.css">
-<script src="qr.js" defer></script>
-<script src="script.js" defer></script>
 </head>
 <body>
 
-<h1>Álbum de Figuritas</h1>
-	<div id="barraProgreso">
-  <div id="progreso" style="width:0%; height:20px; background:#00ffff; border-radius:10px;"></div>
+<!-- Logo arriba -->
+<div id="logo-container">
+    <a href="index.html">
+        <img src="https://i.ibb.co/781Qj0J/logo.png" alt="Logo Los LCDM" id="logo">
+    </a>
 </div>
 
-<div id="contador"></div>
-<div id="album"></div>
-<button id="reiniciar" onclick="reiniciarAlbum()">Reiniciar Colección</button>
-<div id="premio">🎉 ¡Completaste el álbum! Reclama tu premio 🎉</div>
+<!-- Barra superior -->
+<div id="barra-superior">
+    <span id="usuarioActivo"></span>
+    <span id="contador">0 / 5 figuritas</span>
+    <button id="btnReiniciar">Reiniciar Álbum</button>
+    <button id="btnLogout">Cerrar Sesión</button>
+</div>
 
-<script>
-window.onload = function(){
-  mostrarAlbum();
-  agregarFiguritaDesdeQR(); // Detecta QR si viene en la URL
-}
-</script>
+<!-- Contenedor del álbum -->
+<div id="album-container">
+    <h1>Mi Álbum de Figuritas</h1>
+    <div class="figuritas">
+        <div class="figurita" id="fig1">Figurita 1</div>
+        <div class="figurita" id="fig2">Figurita 2</div>
+        <div class="figurita" id="fig3">Figurita 3</div>
+        <div class="figurita" id="fig4">Figurita 4</div>
+        <div class="figurita" id="fig5">Figurita 5</div>
+    </div>
+</div>
 
+<!-- Botón para escanear QR -->
+<div class="qr-section">
+    <button id="btnScanQR">📷 Escanear QR</button>
+    <video id="preview" style="width:300px; display:none;"></video>
+</div>
+
+<script src="qr.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
