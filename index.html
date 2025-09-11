@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bienvenido al Álbum de Los LCDM</title>
 <style>
-  /* Reset y estilos base */
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: 'Arial', sans-serif;
@@ -16,14 +15,9 @@
     align-items: center;
     min-height: 100vh;
   }
-
-  /* Overlay de bienvenida */
   #bienvenida {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     background: #000;
     display: flex;
     flex-direction: column;
@@ -36,7 +30,6 @@
     opacity: 1;
     transition: opacity 1.5s ease;
   }
-
   #bienvenida button {
     margin-top: 20px;
     padding: 10px 20px;
@@ -48,14 +41,9 @@
     color: #0d0d0d;
     transition: all 0.3s;
   }
-
-  #bienvenida button:hover {
-    background: #009999;
-  }
-
-  /* Contenedor de login/registro */
+  #bienvenida button:hover { background: #009999; }
   #login-container {
-    display: none; /* Se muestra después del overlay */
+    display: none;
     flex-direction: column;
     align-items: center;
     background: #111;
@@ -63,76 +51,43 @@
     border-radius: 12px;
     box-shadow: 0 0 20px #00ffff;
   }
-
-  #login-container h2 {
-    margin-bottom: 20px;
-  }
-
+  #login-container h2 { margin-bottom: 20px; }
   #login-container input {
-    margin: 10px 0;
-    padding: 10px;
-    width: 250px;
-    border-radius: 6px;
-    border: none;
+    margin: 10px 0; padding: 10px; width: 250px;
+    border-radius: 6px; border: none;
   }
-
   #login-container button {
-    margin-top: 10px;
-    padding: 10px 20px;
-    border-radius: 6px;
-    border: none;
-    background: #00ffff;
-    color: #0d0d0d;
-    font-weight: bold;
-    cursor: pointer;
+    margin-top: 10px; padding: 10px 20px;
+    border-radius: 6px; border: none;
+    background: #00ffff; color: #0d0d0d;
+    font-weight: bold; cursor: pointer;
     transition: all 0.3s;
   }
-
-  #login-container button:hover {
-    background: #009999;
-    color: white;
-  }
-
-  #mensaje {
-    margin-top: 10px;
-    font-weight: bold;
-  }
-
-  /* Contenedor del logo */
+  #login-container button:hover { background: #009999; color: white; }
+  #mensaje { margin-top: 10px; font-weight: bold; }
   #logo-container {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1100;
+    position: fixed; top: 20px; left: 50%;
+    transform: translateX(-50%); z-index: 1100;
   }
-
-  #logo {
-      max-width: 150px;
-      height: auto;
-      cursor: pointer;
-      transition: transform 0.3s;
-  }
-
-  #logo:hover {
-      transform: scale(1.1);
-  }
-
-  @media (max-width: 480px) {
-      #logo {
-          max-width: 100px;
-      }
-  }
+  #logo { max-width: 150px; height: auto; cursor: pointer; transition: transform 0.3s; }
+  #logo:hover { transform: scale(1.1); }
+  @media (max-width: 480px) { #logo { max-width: 100px; } }
 </style>
 </head>
 <body>
-
 
 <!-- Overlay de bienvenida -->
 <div id="bienvenida">
     <h1>¡Bienvenido al Álbum de Los LCDM!</h1>
     <p>Registrate o inicia sesión para comenzar</p>
     <button onclick="cerrarBienvenida()">Comenzar</button>
+</div>
+
+<!-- Logo -->
+<div id="logo-container">
+    <a href="https://ibb.co/gHRdmcM" target="_blank">
+        <img src="https://i.ibb.co/781Qj0J/logo.png" alt="Logo Los LCDM" id="logo">
+    </a>
 </div>
 
 <!-- Login / Registro -->
@@ -155,13 +110,7 @@
     }, 1500);
   }
 
-<!-- Logo con enlace -->
-<div id="logo-container">
-    <a href="https://ibb.co/gHRdmcM" target="_blank">
-        <img src="https://i.ibb.co/781Qj0J/logo.png" alt="Logo Los LCDM" id="logo">
-    </a>
-</div>
-  // Registro / Login
+  // Registro / Login con localStorage
   function registrarOLogin() {
     const usuario = document.getElementById('usuario').value.trim();
     const password = document.getElementById('password').value.trim();
@@ -183,9 +132,7 @@
         mensaje.textContent = "Login exitoso!";
         mensaje.style.color = "green";
         localStorage.setItem('usuarioActivo', usuario);
-        setTimeout(() => {
-          window.location.href = 'lcdm.html';
-        }, 1000);
+        setTimeout(() => { window.location.href = 'lcdm.html'; }, 1000);
       } else {
         mensaje.textContent = "Contraseña incorrecta";
         mensaje.style.color = "red";
@@ -196,7 +143,14 @@
       mensaje.textContent = "Registro exitoso!";
       mensaje.style.color = "green";
       localStorage.setItem('usuarioActivo', usuario);
-      setTimeout(()
+      setTimeout(() => { window.location.href = 'lcdm.html'; }, 1000);
+    }
+  }
+</script>
+
+</body>
+</html>
+
 
 
 
