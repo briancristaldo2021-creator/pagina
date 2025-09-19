@@ -75,9 +75,7 @@
 
 <!-- Logo arriba -->
 <div id="logo-container">
-    <a href="https://ibb.co/gHRdmcM" target="_blank">
-        <img src="https://i.ibb.co/781Qj0J/logo.png" alt="Logo Los LCDM" id="logo">
-    </a>
+    <img src="https://i.ibb.co/781Qj0J/logo.png" alt="Logo Los LCDM" id="logo">
 </div>
 
 <!-- Overlay de bienvenida -->
@@ -86,7 +84,6 @@
   <p>Registrate o inicia sesión para comenzar</p>
   <button onclick="cerrarBienvenida()">Comenzar</button>
 </div>
-
 <!-- Login / Registro -->
 <div id="login-container">
   <h2>Registro / Login</h2>
@@ -94,63 +91,63 @@
   <input type="password" id="password" placeholder="Contraseña">
   <button onclick="registrarOLogin()">Ingresar</button>
   <p id="mensaje"></p>
+  <p>¿No tenés cuenta? <a href="registro.html">Registrate aquí</a></p>
 </div>
 
 <script>
-  // ==========================================
-  // Cerrar overlay
-  // ==========================================
-  function cerrarBienvenida() {
-    const overlay = document.getElementById('bienvenida');
-    overlay.style.opacity = 0;
-    setTimeout(() => {
-        overlay.style.display = 'none';
-        document.getElementById('login-container').style.display = 'flex';
-    }, 1500);
+
+// ==============================
+// Overlay de bienvenida
+// ==============================
+function cerrarBienvenida() {
+  const overlay = document.getElementById('bienvenida');
+  overlay.style.opacity = 0;
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    document.getElementById('login-container').style.display = 'flex';
+  }, 1000);
+}
+
+// ==============================
+// Registro / Login
+// ==============================
+function registrarOLogin() {
+  const usuario = document.getElementById('usuario').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const mensaje = document.getElementById('mensaje');
+
+  if(!usuario || !password){
+      mensaje.textContent = "Completa todos los campos";
+      mensaje.style.color = "red";
+      return;
   }
 
-  // ==========================================
-  // Registro / Login
-  // ==========================================
-  function registrarOLogin() {
-    const usuario = document.getElementById('usuario').value.trim();
-    const password = document.getElementById('password').value.trim();
-    const mensaje = document.getElementById('mensaje');
+  const key = 'user_' + usuario;
+  const datosGuardados = localStorage.getItem(key);
 
-    if(!usuario || !password){
-        mensaje.textContent = "Completa todos los campos";
-        mensaje.style.color = "red";
-        return;
-    }
-
-    const key = 'user_' + usuario;
-    const datosGuardados = localStorage.getItem(key);
-
-    if(datosGuardados){
-        const userObj = JSON.parse(datosGuardados);
-        if(userObj.password === password){
-            localStorage.setItem('usuarioActivo', usuario);
-            window.location.href = 'album.html';
-        } else {
-            mensaje.textContent = "Contraseña incorrecta";
-            mensaje.style.color = "red";
-        }
-    } else {
-        localStorage.setItem(key, JSON.stringify({usuario, password, figuritas: []}));
-        localStorage.setItem('usuarioActivo', usuario);
-        window.location.href = 'album.html';
-    }
+  if(datosGuardados){
+      const userObj = JSON.parse(datosGuardados);
+      if(userObj.password === password){
+          localStorage.setItem('usuarioActivo', usuario);
+          window.location.href = 'album.html';
+      } else {
+          mensaje.textContent = "Contraseña incorrecta";
+          mensaje.style.color = "red";
+      }
+  } else {
+      localStorage.setItem(key, JSON.stringify({usuario, password, figuritas: []}));
+      localStorage.setItem('usuarioActivo', usuario);
+      window.location.href = 'album.html';
   }
+}
 
-  // ==========================================
-  // Evento Enter para login
-  // ==========================================
-  document.getElementById('password').addEventListener('keypress', function(e) {
-      if(e.key === 'Enter') registrarOLogin();
-  });
-  document.getElementById('usuario').addEventListener('keypress', function(e) {
-      if(e.key === 'Enter') registrarOLogin();
-  });
+// Enter para enviar
+document.getElementById('password').addEventListener('keypress', e => {
+  if(e.key === 'Enter') registrarOLogin();
+});
+document.getElementById('usuario').addEventListener('keypress', e => {
+  if(e.key === 'Enter') registrarOLogin();
+});
 </script>
 
 </body>

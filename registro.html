@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Registro</title>
 <link rel="stylesheet" href="style.css">
-<script src="script.js" defer></script>
+<script src="codigos.js" defer></script>
 </head>
 <body>
 
@@ -17,6 +17,32 @@
 </form>
 <p id="mensaje"></p>
 <p>¿Ya tenés cuenta? <a href="index.html">Login</a></p>
+
+<script>
+document.getElementById("registroForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const usuario = document.getElementById("usuario").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const mensaje = document.getElementById("mensaje");
+
+  if(!usuario || !password){
+    mensaje.textContent = "Completa todos los campos";
+    mensaje.style.color = "red";
+    return;
+  }
+
+  const key = "user_" + usuario;
+  if(localStorage.getItem(key)){
+    mensaje.textContent = "El usuario ya existe";
+    mensaje.style.color = "orange";
+    return;
+  }
+
+  localStorage.setItem(key, JSON.stringify({usuario, password, figuritas: []}));
+  localStorage.setItem("usuarioActivo", usuario);
+  window.location.href = "album.html";
+});
+</script>
 
 </body>
 </html>

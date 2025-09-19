@@ -1,47 +1,36 @@
 // ==========================================
 // Detección de QR con Html5Qrcode
 // ==========================================
-
-// Figuritas vinculadas a QR
-const codigosQR = {
-    "fig1": 1,
-    "fig2": 2,
-    "fig3": 3,
-    "fig4": 4,
-    "fig5": 5
-};
-
 function iniciarScanner() {
     const qrReader = new Html5Qrcode("qr-reader");
 
     qrReader.start(
-        { facingMode: "environment" }, // cámara trasera en celular
+        { facingMode: "environment" },
         { fps: 10, qrbox: 250 },
         qrCodeMessage => {
             procesarQR(qrCodeMessage);
             qrReader.stop();
-            document.getElementById('qr-reader').innerHTML = "<p>QR escaneado ?</p>";
-        },
-        errorMessage => {
-            // errores normales de escaneo
+            document.getElementById("qr-reader").innerHTML = "<p>QR escaneado ?</p>";
         }
     ).catch(err => {
         console.error("Error al iniciar QR: ", err);
-        alert("No se pudo iniciar la cámara ??");
+        mostrarToast("No se pudo iniciar la cámara", "red");
     });
 }
 
 function procesarQR(qrCodeMessage) {
-    const usuario = localStorage.getItem('usuarioActivo');
+    const usuario = localStorage.getItem("usuarioActivo");
     if (!usuario) {
-        alert("Debes iniciar sesión.");
+        mostrarToast("Debes iniciar sesión", "red");
         window.location.href = "index.html";
         return;
     }
 
-    const datos = JSON.parse(localStorage.getItem('user_' + usuario));
-    let figuritaId = null;
+    const key = "user_" + usuario;
+    const datos = JSON.parse(localStorage.getItem(key));
+    datos.figuritas = datos.figuritas || [];
 
+    let figuritaId = null;
     for (const [clave, id] of Object.entries(codigosQR)) {
         if (qrCodeMessage.includes(clave)) {
             figuritaId = id;
@@ -50,17 +39,25 @@ function procesarQR(qrCodeMessage) {
     }
 
     if (!figuritaId) {
-        alert("QR inválido ?");
+        mostrarToast("QR inválido", "red");
         return;
     }
 
     if (!datos.figuritas.includes(figuritaId)) {
         datos.figuritas.push(figuritaId);
-        localStorage.setItem('user_' + usuario, JSON.stringify(datos));
-        alert(`¡Felicitaciones! Obtuviste la figurita ${figuritaId} ??`);
+        localStorage.setItem(key, JSON.stringify(datos));
+
+        const elem = document.getElementById(figuritaId);
+        if (elem) {
+            elem.classList.add("coleccionada");
+            const fig = figuritasData.find(f => f.id === figuritaId);
+            if (fig) elem.querySelector("img").src = fig.imgColor;
+        }
+
+        mostrarToast(`¡Felicitaciones! Obtuviste la ${figuritaId} ??`, "lime");
     } else {
-        alert("Ya tienes esta figurita ??");
+        mostrarToast("Ya tienes esta figurita", "orange");
     }
 
-    mostrarAlbum();
+    if (window.actualizarContador) window.actualizarContador();
 }

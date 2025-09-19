@@ -1,8 +1,21 @@
-‌index
-album
-lcdm
-registro
-carpeta img 
-qr.js
-script.js
-style.ccs
+/ (raíz de tu hosting)
+ ├── index.html
+ ├── registro.html
+ ├── album.html
+ ├── lcdm.html
+ ├── generarQR.html
+ ├── style.css
+ ├── codigos.js
+ ├── script.js
+ ├── qr.js
+ └── /img/   
+      ├── fig1.png
+      ├── fig1_gray.png
+      ├── fig2.png
+      ├── fig2_gray.png
+      ├── fig3.png
+      ├── fig3_gray.png
+      ├── fig4.png
+      ├── fig4_gray.png
+      ├── fig5.png
+      └── fig5_gray.png

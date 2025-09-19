@@ -1,5 +1,5 @@
 /* ==============================
-   Estilos generales del body
+   Estilos generales
    ============================== */
 body {
     font-family: Arial, sans-serif;
@@ -7,24 +7,24 @@ body {
     color: #00ffff;
     margin: 0;
     padding: 0;
+    text-align: center;
 }
 
-/* ==============================
-   Logo
-   ============================== */
+/* Logo */
 #logo-container {
     text-align: center;
     margin: 20px 0;
 }
-
 #logo-container img {
     width: 150px;
     cursor: pointer;
+    transition: transform 0.3s;
+}
+#logo-container img:hover {
+    transform: scale(1.1);
 }
 
-/* ==============================
-   Barra superior
-   ============================== */
+/* Barra superior */
 #barra-superior {
     display: flex;
     justify-content: center;
@@ -34,11 +34,9 @@ body {
     padding: 10px 0;
     box-shadow: 0 0 10px #00ffff;
 }
-
 #barra-superior span {
     font-weight: bold;
 }
-
 #barra-superior button {
     background: #ff00ff;
     color: #0d0d0d;
@@ -49,29 +47,87 @@ body {
     font-weight: bold;
     transition: all 0.3s;
 }
-
 #barra-superior button:hover {
     background: #990099;
     color: white;
 }
 
-/* ==============================
-   Contenedor del álbum
-   ============================== */
+/* Contenedor del álbum */
 #album-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin: 20px auto;
 }
-
 #album-container h1 {
     margin-bottom: 20px;
 }
+/* Tooltip flotante */
+#tooltipAyuda {
+    display: none;
+    position: absolute;
+    top: 45px; /* Debajo del botón */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 280px;
+    background-color: rgba(0,0,0,0.95);
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    z-index: 1000;
+    animation: desplegar 0.3s ease;
+}
 
-/* ==============================
-   Figuritas
-   ============================== */
+/* Flecha del tooltip */
+.tooltipFlecha {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid rgba(0,0,0,0.95);
+}
+
+/* Contenido con scroll si es largo */
+.tooltipContenido {
+    max-height: 150px; /* Altura máxima */
+    overflow-y: auto;
+    padding: 15px;
+}
+
+/* Títulos y párrafos */
+#tooltipAyuda h3 {
+    margin-top: 0;
+    text-align: center;
+    font-size: 16px;
+}
+
+/* Scroll personalizado */
+.tooltipContenido::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tooltipContenido::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+}
+
+.tooltipContenido::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.5);
+    border-radius: 3px;
+}
+
+/* Animación de aparición */
+@keyframes desplegar {
+    from { opacity: 0; transform: translate(-50%, -10px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Figuritas */
 .figuritas {
     display: flex;
     flex-wrap: wrap;
@@ -79,12 +135,11 @@ body {
     gap: 20px;
     max-width: 800px;
 }
-
 .figurita {
     background: #111;
     color: #00ffff;
     width: 120px;
-    height: 140px;
+    height: 160px;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
@@ -94,30 +149,37 @@ body {
     font-weight: bold;
     transition: transform 0.3s, border 0.3s;
     text-align: center;
+    padding: 5px;
 }
-
 .figurita img {
     width: 80px;
     height: 80px;
     margin-bottom: 5px;
     border-radius: 6px;
+    filter: grayscale(100%);
+    transition: filter 0.5s ease;
 }
-
+.figurita.coleccionada img {
+    filter: grayscale(0%);
+}
 .figurita.coleccionada {
-    border: 3px solid green;
+    border: 3px solid lime;
     transform: scale(1.1);
+    animation: desbloqueo 1s ease;
+}
+@keyframes desbloqueo {
+    0% { transform: scale(0.5) rotate(-20deg); opacity: 0; }
+    50% { transform: scale(1.2) rotate(10deg); opacity: 1; }
+    100% { transform: scale(1.1) rotate(0); }
 }
 
-/* ==============================
-   QR Section
-   ============================== */
+/* QR Section */
 .qr-section {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin: 20px 0;
 }
-
 #btnScanQR {
     background: #ff00ff;
     color: #0d0d0d;
@@ -128,35 +190,63 @@ body {
     font-weight: bold;
     transition: all 0.3s;
 }
-
 #btnScanQR:hover {
     background: #990099;
     color: white;
 }
-
-/* QR reader */
 #qr-reader {
     width: 300px;
     margin-top: 10px;
 }
 
-/* ==============================
-   Responsivo
-   ============================== */
+/* Toast (notificaciones) */
+#toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111;
+  color: #00ffff;
+  padding: 12px 20px;
+  border-radius: 6px;
+  box-shadow: 0 0 10px #00ffff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  z-index: 2000;
+}
+#toast.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Overlay de completado */
+#completado-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.95);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #00ffff;
+  font-size: 2rem;
+  text-align: center;
+  z-index: 3000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease;
+}
+#completado-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Responsivo */
 @media (max-width: 600px) {
-    .figuritas {
-        gap: 10px;
-    }
-    .figurita {
-        width: 90px;
-        height: 110px;
-    }
-    .figurita img {
-        width: 60px;
-        height: 60px;
-    }
-    #barra-superior {
-        flex-direction: column;
-        gap: 10px;
-    }
+    .figuritas { gap: 10px; }
+    .figurita { width: 90px; height: 120px; }
+    .figurita img { width: 60px; height: 60px; }
+    #barra-superior { flex-direction: column; gap: 10px; }
 }
