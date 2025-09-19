@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Generar QR Figuritas</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="codigos.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background:#0d0d0d; color:#00ffff; }
+    #qrs { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 30px; }
+    .qr-box { border: 1px solid #00ffff; padding: 10px; border-radius: 10px; background:#111; }
+  </style>
+</head>
+<body>
+  <h1>Generador de QR para Figuritas</h1>
+  <div id="qrs"></div>
+
+  <script>
+    Object.keys(codigosQR).forEach(clave => {
+        const box = document.createElement("div");
+        box.className = "qr-box";
+        box.innerHTML = `<h3>${codigosQR[clave]}</h3><div id="qr-${clave}"></div>`;
+        document.getElementById("qrs").appendChild(box);
+
+        new QRCode(document.getElementById("qr-" + clave), {
+            text: clave,
+            width: 150,
+            height: 150
+        });
+    });
+  </script>
+</body>
+</html>

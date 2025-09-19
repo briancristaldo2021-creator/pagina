@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Álbum de Los LCDM</title>
 <link rel="stylesheet" href="style.css">
+<script src="codigos.js"></script>
 </head>
 <body>
 
@@ -19,31 +20,36 @@
 <div id="barra-superior">
     <span id="usuarioActivo"></span>
     <span id="contador">0 / 5 figuritas</span>
-    <button id="btnReiniciar">Reiniciar Álbum</button>
+	<button id="btnAyuda">Ayuda</button>
+    <button id="btnReiniciar">Completar</button>
     <button id="btnLogout">Cerrar Sesión</button>
 </div>
 
 <!-- Contenedor del álbum -->
 <div id="album-container">
     <h1>Mi Álbum de Figuritas</h1>
-    <div class="figuritas">
-        <div class="figurita" id="fig1">Figurita 1</div>
-        <div class="figurita" id="fig2">Figurita 2</div>
-        <div class="figurita" id="fig3">Figurita 3</div>
-        <div class="figurita" id="fig4">Figurita 4</div>
-        <div class="figurita" id="fig5">Figurita 5</div>
-    </div>
+    <div class="figuritas" id="figuritasContainer"></div>
 </div>
 
 <!-- Escaneo QR -->
 <div class="qr-section">
-    <div id="qr-reader" style="width:300px; margin:20px auto;"></div>
-    <button onclick="iniciarScanner()">📷 Escanear QR</button>
+    <div id="qr-reader"></div>
+    <button id="btnScanQR" onclick="iniciarScanner()">📷 Escanear QR</button>
+</div>
+
+<!-- Notificaciones -->
+<div id="toast"></div>
+
+<!-- Overlay completado -->
+<div id="completado-overlay">
+  <h1>🎉 ¡Felicidades!</h1>
+  <p>Completaste el álbum de Los LCDM</p>
 </div>
 
 <!-- Scripts -->
 <script src="https://unpkg.com/html5-qrcode"></script>
-<script src="qr.js"></script>
 <script src="script.js"></script>
+<script src="qr.js"></script>
+
 </body>
 </html>
