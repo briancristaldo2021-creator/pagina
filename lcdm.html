@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Álbum Completo LCDM</title>
 <link rel="stylesheet" href="style.css">
-<script src="codigos.js"></script>
 </head>
 <body>
 
@@ -14,25 +13,14 @@
 <div id="album">
   <h1>¡Explorá el Álbum!</h1>
   <p>Aquí van las fotos y recuerdos de Los LCDM.</p>
-  <div class="figuritas" id="figuritasPreview"></div>
+  <!-- Podes agregar más imágenes o contenido aquí -->
 </div>
 
 <script>
-// Preview de figuritas desde codigos.js
-window.addEventListener("DOMContentLoaded", () => {
-  const cont = document.getElementById("figuritasPreview");
-  figuritasData.forEach(fig => {
-    const div = document.createElement("div");
-    div.className = "figurita";
-    div.innerHTML = `<img src=\"${fig.imgColor}\" alt=\"${fig.nombre}\"><span>${fig.nombre}</span>`;
-    cont.appendChild(div);
-  });
-});
-
-// Animación overlay
 setTimeout(() => {
   const overlay = document.getElementById('overlay');
   const album = document.getElementById('album');
+
   overlay.style.opacity = 0;
   setTimeout(() => {
     overlay.style.display = 'none';

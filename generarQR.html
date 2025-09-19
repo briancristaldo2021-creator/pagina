@@ -4,11 +4,10 @@
   <meta charset="UTF-8">
   <title>Generar QR Figuritas</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="codigos.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; background:#0d0d0d; color:#00ffff; }
+    body { font-family: Arial, sans-serif; text-align: center; }
     #qrs { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 30px; }
-    .qr-box { border: 1px solid #00ffff; padding: 10px; border-radius: 10px; background:#111; }
+    .qr-box { border: 1px solid #ccc; padding: 10px; border-radius: 10px; }
   </style>
 </head>
 <body>
@@ -16,6 +15,16 @@
   <div id="qrs"></div>
 
   <script>
+    // 👇 Estos son los códigos que ya usás en qr.js
+    const codigosQR = {
+        "lcdm_fig1": "fig1",
+        "lcdm_fig2": "fig2",
+        "lcdm_fig3": "fig3",
+        "lcdm_fig4": "fig4",
+        "lcdm_fig5": "fig5"
+    };
+
+    // Generar un QR por cada figurita
     Object.keys(codigosQR).forEach(clave => {
         const box = document.createElement("div");
         box.className = "qr-box";
@@ -23,7 +32,7 @@
         document.getElementById("qrs").appendChild(box);
 
         new QRCode(document.getElementById("qr-" + clave), {
-            text: clave,
+            text: clave, // contenido que leerá el escáner
             width: 150,
             height: 150
         });
@@ -31,3 +40,4 @@
   </script>
 </body>
 </html>
+
