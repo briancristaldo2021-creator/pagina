@@ -73,3 +73,17 @@ function mostrarCompletado() {
   overlay.classList.add("visible");
   setTimeout(() => overlay.classList.remove("visible"), 6000);
 }
+// Mostrar y ocultar el tooltip
+const btnAyuda = document.getElementById('btnAyuda');
+const tooltipAyuda = document.getElementById('tooltipAyuda');
+
+btnAyuda.addEventListener('click', () => {
+    tooltipAyuda.style.display = (tooltipAyuda.style.display === 'block') ? 'none' : 'block';
+});
+
+// Cerrar tooltip si se hace clic fuera
+window.addEventListener('click', (e) => {
+    if (!btnAyuda.contains(e.target) && !tooltipAyuda.contains(e.target)) {
+        tooltipAyuda.style.display = 'none';
+    }
+});

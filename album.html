@@ -20,7 +20,25 @@
 <div id="barra-superior">
     <span id="usuarioActivo"></span>
     <span id="contador">0 / 5 figuritas</span>
-	<button id="btnAyuda">Ayuda</button>
+    <div style="position: relative; display: inline-block;">
+        <button id="btnAyuda">Ayuda</button>
+        <!-- Tooltip moderno -->
+        <div id="tooltipAyuda">
+            <div class="tooltipFlecha"></div>
+            <div class="tooltipContenido">
+                <h3>Ayuda / Reglas</h3>
+                <p>
+                    1. Puedes coleccionar hasta 5 figuritas por día.<br>
+                    2. Haz clic en cada figurita para ver su contenido.<br>
+                    3. ¡Disfruta del álbum y comparte con tus amigos!<br>
+                    4. Este texto es más largo para mostrar cómo se ve la barra de desplazamiento.<br>
+                    5. Sigue agregando más reglas si es necesario para que se active el scroll.<br>
+                    6. Recuerda que puedes personalizar todo el contenido.<br>
+                    7. Y puedes agregar imágenes si quieres.
+                </p>
+            </div>
+        </div>
+    </div>
     <button id="btnReiniciar">Completar</button>
     <button id="btnLogout">Cerrar Sesión</button>
 </div>
