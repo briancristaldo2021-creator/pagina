@@ -1,5 +1,5 @@
 // ==============================
-// Figuritas y CÛdigos QR centralizados
+// Figuritas y C√≥digos QR centralizados
 // ==============================
 
 // Claves de QR => ID de figurita
@@ -11,37 +11,38 @@ const codigosQR = {
   "lcdm_fig5": "fig5"
 };
 
-// Lista de figuritas con sus im·genes
-// ?? Debes poner tus im·genes reales en /img/ (una en color y otra en gris)
+// Lista de figuritas con sus im√°genes
+// ?? Debes poner tus im√°genes reales en /img/ (una en color y otra en gris)
 const figuritasData = [
   {
     id: "fig1",
     nombre: "Figurita 1",
-    imgBloqueada: "img/fig1_gray.png",
-    imgColor: "img/fig1.png"
+    imgBloqueada: "img/fig1_gray.jpg",
+    imgColor: "img/fig1.jpg"
   },
   {
     id: "fig2",
     nombre: "Figurita 2",
-    imgBloqueada: "img/fig2_gray.png",
-    imgColor: "img/fig2.png"
+    imgBloqueada: "img/fig2_gray.jpg",
+    imgColor: "img/fig2.jpg"
   },
   {
     id: "fig3",
     nombre: "Figurita 3",
-    imgBloqueada: "img/fig3_gray.png",
-    imgColor: "img/fig3.png"
+    imgBloqueada: "img/fig3_gray.jpg",
+    imgColor: "img/fig3.jpg"
   },
   {
     id: "fig4",
     nombre: "Figurita 4",
-    imgBloqueada: "img/fig4_gray.png",
-    imgColor: "img/fig4.png"
+    imgBloqueada: "img/fig4_gray.jpg",
+    imgColor: "img/fig4.jpg"
   },
   {
     id: "fig5",
     nombre: "Figurita 5",
-    imgBloqueada: "img/fig5_gray.png",
-    imgColor: "img/fig5.png"
+    imgBloqueada: "img/fig5_gray.jpg",
+    imgColor: "img/fig5.jpg"
   }
 ];
+
