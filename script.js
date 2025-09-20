@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Mostrar usuario con emoji usando código HTML
+  // Mostrar usuario con emoji
   document.getElementById("usuarioActivo").innerHTML =
     '<span style="color: green;">&#128104;</span> ' + usuarioActivo;
 
@@ -30,12 +30,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   actualizarContador();
 
-  // Botón Canjear Premio - ahora siempre toma datos actualizados desde localStorage
+  // Botón Canjear Premio
   document.getElementById("btnReiniciar").addEventListener("click", () => {
-    const datosActualizados = JSON.parse(localStorage.getItem(key)) || {};
-    datosActualizados.figuritas = datosActualizados.figuritas || [];
-
-    if (datosActualizados.figuritas.length === figuritasData.length) {
+    if (datos.figuritas.length === figuritasData.length) {
       mostrarCelebracionConPremio();
     } else {
       mostrarOverlayMensaje("? Aún no completaste el álbum. ¡Sigue coleccionando figuritas!");
@@ -62,10 +59,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Función para actualizar el contador
   function actualizarContador() {
-    const datosActualizados = JSON.parse(localStorage.getItem(key)) || {};
-    const figuritas = datosActualizados.figuritas || [];
     document.getElementById("contador").textContent =
-      `${figuritas.length} / ${figuritasData.length} figuritas`;
+      `${datos.figuritas.length} / ${figuritasData.length} figuritas`;
   }
 
   window.actualizarContador = actualizarContador;
@@ -93,12 +88,12 @@ function mostrarCelebracionConPremio() {
     <canvas id="confeti"></canvas>
     <canvas id="fuegos"></canvas>
 
-    <!-- Video de YouTube oculto para música -->
+    <!-- Video de YouTube invisible para música -->
     <iframe 
       id="musicaYT"
       width="0" 
       height="0" 
-      src="https://www.youtube.com/embed/8e1WaWQNXMU?autoplay=1&loop=1&playlist=8e1WaWQNXMU" 
+      src="https://www.youtube.com/embed/8e1WaWQNXMU?autoplay=1&loop=1&playlist=8e1WaWQNXMU&controls=0&modestbranding=1&rel=0&showinfo=0" 
       frameborder="0" 
       allow="autoplay; encrypted-media" 
       allowfullscreen>
