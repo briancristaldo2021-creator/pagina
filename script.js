@@ -30,9 +30,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   actualizarContador();
 
-  // Botón Canjear Premio
+  // Botón Canjear Premio - ahora siempre toma datos actualizados desde localStorage
   document.getElementById("btnReiniciar").addEventListener("click", () => {
-    if (datos.figuritas.length === figuritasData.length) {
+    const datosActualizados = JSON.parse(localStorage.getItem(key)) || {};
+    datosActualizados.figuritas = datosActualizados.figuritas || [];
+
+    if (datosActualizados.figuritas.length === figuritasData.length) {
       mostrarCelebracionConPremio();
     } else {
       mostrarOverlayMensaje("? Aún no completaste el álbum. ¡Sigue coleccionando figuritas!");
@@ -59,8 +62,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Función para actualizar el contador
   function actualizarContador() {
+    const datosActualizados = JSON.parse(localStorage.getItem(key)) || {};
+    const figuritas = datosActualizados.figuritas || [];
     document.getElementById("contador").textContent =
-      `${datos.figuritas.length} / ${figuritasData.length} figuritas`;
+      `${figuritas.length} / ${figuritasData.length} figuritas`;
   }
 
   window.actualizarContador = actualizarContador;
