@@ -1,5 +1,5 @@
 // ==============================
-// Figuritas y C√≥digos QR centralizados
+// Figuritas y CÛdigos QR centralizados
 // ==============================
 
 // Claves de QR => ID de figurita
@@ -11,8 +11,8 @@ const codigosQR = {
   "lcdm_fig5": "fig5"
 };
 
-// Lista de figuritas con sus im√°genes
-// ?? Debes poner tus im√°genes reales en /img/ (una en color y otra en gris)
+// Lista de figuritas con sus im·genes
+// ?? Debes poner tus im·genes reales en /img/ (una en color y otra en gris)
 const figuritasData = [
   {
     id: "fig1",
@@ -45,4 +45,3 @@ const figuritasData = [
     imgColor: "img/fig5.jpg"
   }
 ];
-

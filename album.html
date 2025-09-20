@@ -6,23 +6,63 @@
 <title>Álbum de Los LCDM</title>
 <link rel="stylesheet" href="style.css">
 <script src="codigos.js"></script>
+<style>
+/* Overlay máximo */
+#completado-overlay {
+    position: fixed;
+    top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-family: sans-serif;
+    font-size: 2rem;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
+    overflow: hidden;
+}
+#completado-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+#completado-overlay h1 {
+    font-size: 3rem;
+    animation: parpadeo 1s infinite alternate;
+    color: gold;
+    text-shadow: 0 0 10px #fff, 0 0 20px yellow;
+}
+#completado-overlay p {
+    font-size: 1.8rem;
+    text-align: center;
+}
+#completado-overlay canvas {
+    position: absolute;
+    top:0; left:0;
+}
+@keyframes parpadeo {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+    100% { opacity: 1; transform: scale(1); }
+}
+</style>
 </head>
 <body>
 
-<!-- Logo arriba -->
 <div id="logo-container">
     <a href="index.html">
         <img src="https://i.ibb.co/781Qj0J/logo.png" alt="Logo Los LCDM" id="logo">
     </a>
 </div>
 
-<!-- Barra superior -->
 <div id="barra-superior">
     <span id="usuarioActivo"></span>
     <span id="contador">0 / 5 figuritas</span>
     <div style="position: relative; display: inline-block;">
         <button id="btnAyuda">Ayuda</button>
-        <!-- Tooltip moderno -->
         <div id="tooltipAyuda">
             <div class="tooltipFlecha"></div>
             <div class="tooltipContenido">
@@ -31,40 +71,30 @@
                     1. Puedes coleccionar hasta 5 figuritas por día.<br>
                     2. Haz clic en cada figurita para ver su contenido.<br>
                     3. ¡Disfruta del álbum y comparte con tus amigos!<br>
-                    4. Este texto es más largo para mostrar cómo se ve la barra de desplazamiento.<br>
-                    5. Sigue agregando más reglas si es necesario para que se active el scroll.<br>
-                    6. Recuerda que puedes personalizar todo el contenido.<br>
-                    7. Y puedes agregar imágenes si quieres.
+                    4. Continúa agregando más reglas si lo deseas.<br>
+                    5. Personaliza todo el contenido.<br>
+                    6. Agrega imágenes si quieres.
                 </p>
             </div>
         </div>
     </div>
-    <button id="btnReiniciar">Completar</button>
+    <button id="btnReiniciar">🎁 Canjear Premio</button>
     <button id="btnLogout">Cerrar Sesión</button>
 </div>
 
-<!-- Contenedor del álbum -->
 <div id="album-container">
     <h1>Mi Álbum de Figuritas</h1>
     <div class="figuritas" id="figuritasContainer"></div>
 </div>
 
-<!-- Escaneo QR -->
 <div class="qr-section">
     <div id="qr-reader"></div>
     <button id="btnScanQR" onclick="iniciarScanner()">📷 Escanear QR</button>
 </div>
 
-<!-- Notificaciones -->
 <div id="toast"></div>
+<div id="completado-overlay"></div>
 
-<!-- Overlay completado -->
-<div id="completado-overlay">
-  <h1>🎉 ¡Felicidades!</h1>
-  <p>Completaste el álbum de Los LCDM</p>
-</div>
-
-<!-- Scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script src="qr.js"></script>
