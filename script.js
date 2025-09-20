@@ -77,18 +77,31 @@ document.getElementById("overlay-msg-close").addEventListener("click", () => {
   document.getElementById("overlay-msg").style.display = "none";
 });
 
-// === Celebración con premio ===
+// === Celebración con premio con música de YouTube ===
 function mostrarCelebracionConPremio() {
   const overlay = document.getElementById("completado-overlay");
+
   overlay.innerHTML = `
     <h1>&#127881; ¡Felicidades ${localStorage.getItem("usuarioActivo")}! &#127881;</h1>
     <p>¡Completaste tu Álbum!</p>
     <p style="font-size:1.5rem; color:yellow;">Tu premio: <b>CODIGO1234</b></p>
     <canvas id="confeti"></canvas>
     <canvas id="fuegos"></canvas>
-    <audio id="musica" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" autoplay></audio>
+
+    <!-- Video de YouTube oculto para música -->
+    <iframe 
+      id="musicaYT"
+      width="0" 
+      height="0" 
+      src="https://www.youtube.com/embed/8e1WaWQNXMU?autoplay=1&loop=1&playlist=8e1WaWQNXMU" 
+      frameborder="0" 
+      allow="autoplay; encrypted-media" 
+      allowfullscreen>
+    </iframe>
   `;
+
   overlay.classList.add("visible");
+
   iniciarConfeti();
   iniciarFuegosArtificiales();
 
