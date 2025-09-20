@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Álbum de Los LCDM</title>
 <link rel="stylesheet" href="style.css">
-<script src="codigos.js"></script>
+
+<!-- Estilos internos para overlays y mensajes -->
 <style>
 /* Overlay máximo */
 #completado-overlay {
@@ -48,16 +49,44 @@
     50% { opacity: 0.8; transform: scale(1.1); }
     100% { opacity: 1; transform: scale(1); }
 }
+
+/* Overlay de mensajes QR o botón */
+#overlay-msg {
+    position: fixed;
+    top:50%; left:50%;
+    transform: translate(-50%,-50%);
+    background: rgba(0,0,0,0.95);
+    color: #fff;
+    font-size:1.5rem;
+    padding:2rem;
+    border-radius:15px;
+    z-index:99999;
+    display:none;
+    text-align:center;
+}
+#overlay-msg button {
+    margin-top:1rem;
+    padding:0.5rem 1rem;
+    font-size:1rem;
+    cursor:pointer;
+    border:none;
+    border-radius:5px;
+    background: gold;
+    color:black;
+    font-weight:bold;
+}
 </style>
 </head>
 <body>
 
+<!-- Logo -->
 <div id="logo-container">
     <a href="index.html">
         <img src="https://i.ibb.co/781Qj0J/logo.png" alt="Logo Los LCDM" id="logo">
     </a>
 </div>
 
+<!-- Barra superior -->
 <div id="barra-superior">
     <span id="usuarioActivo"></span>
     <span id="contador">0 / 5 figuritas</span>
@@ -78,25 +107,38 @@
             </div>
         </div>
     </div>
-    <button id="btnReiniciar">🎁 Canjear Premio</button>
+    <button id="btnReiniciar">&#127873; Canjear Premio</button>
     <button id="btnLogout">Cerrar Sesión</button>
 </div>
 
+<!-- Álbum -->
 <div id="album-container">
     <h1>Mi Álbum de Figuritas</h1>
     <div class="figuritas" id="figuritasContainer"></div>
 </div>
 
+<!-- Escaneo QR -->
 <div class="qr-section">
     <div id="qr-reader"></div>
-    <button id="btnScanQR" onclick="iniciarScanner()">📷 Escanear QR</button>
+    <button id="btnScanQR" onclick="iniciarScanner()">&#128247; Escanear QR</button>
 </div>
 
+<!-- Toast -->
 <div id="toast"></div>
 <div id="completado-overlay"></div>
 
+<!-- Overlay mensajes QR -->
+<div id="overlay-msg">
+    <div id="overlay-msg-text"></div>
+    <button id="overlay-msg-close">Cerrar</button>
+</div>
+
+<!-- Librerías -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
+
+<!-- JS del proyecto -->
+<script src="codigos.js"></script>
 <script src="qr.js"></script>
 <script src="script.js"></script>
 </body>
