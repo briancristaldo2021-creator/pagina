@@ -67,7 +67,10 @@ body {
     margin-bottom: 20px;
     color: #00ffff;
 }
-
+button:hover {
+    box-shadow: 0 0 15px #ff00ff, 0 0 30px #00ffff;
+    transform: scale(1.1) rotate(-2deg);
+}
 /* Tooltip flotante */
 #tooltipAyuda {
     display: none;
