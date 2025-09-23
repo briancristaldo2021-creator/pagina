@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Cofundador</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div style="max-width:1000px;margin:20px auto;padding:20px;background:#111;border-radius:12px">
+  <a href="album.html">← Volver</a>
+  <h1>Panel Cofundador (Demo)</h1>
+  <div id="stats"></div>
+  <h3>Usuarios</h3>
+  <div id="usersList" style="display:flex;flex-direction:column;gap:6px"></div>
+  <div style="margin-top:12px">
+    <button id="btnResetAll">Resetear demo (borrar usuarios)</button>
+    <button id="btnExport">Exportar usuarios (console)</button>
+  </div>
+</div>
+
+<script>
+const active = localStorage.getItem('usuarioActivo');
+if(active !== 'admin' && active !== 'cofundador'){
+  alert('Acceso restringido: iniciá sesión como admin o cofundador (demo)');
+  window.location.href = 'album.html';
+}
+
+function mostrarStats(){
+  let totalUsuarios=0; let totalFig=0; let totalCoins=0;
+  const list = document.getElementById('usersList'); list.innerHTML='';
+  for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    if(key.startsWith('user_')){
+      const datos = JSON.parse(localStorage.getItem(key));
+      totalUsuarios++; totalFig += (datos.figuritas||[]).length; totalCoins += (datos.coins||0);
+      const el = document.createElement('div');
+      el.innerHTML = `${datos.usuario} — figuritas: ${(datos.figuritas||[]).length} — coins: ${datos.coins||0}`;
+      list.appendChild(el);
+    }
+  }
+  document.getElementById('stats').innerHTML = `Usuarios: ${totalUsuarios} · Figuritas totales: ${totalFig} · Coins totales: ${totalCoins}`;
+}
+
+document.getElementById('btnResetAll').addEventListener('click', ()=>{
+  if(confirm('Borrar todos los users?')){
+    const keys = [];
+    for(let i=0;i<localStorage.length;i++){ const k = localStorage.key(i); if(k && k.startsWith('user_')) keys.push(k); }
+    keys.forEach(k=> localStorage.removeItem(k));
+    alert('Usuarios eliminados'); location.reload();
+  }
+});
+
+document.getElementById('btnExport').addEventListener('click', ()=>{
+  const dump = {};
+  for(let i=0;i<localStorage.length;i++){ const k = localStorage.key(i); if(k.startsWith('user_')) dump[k] = JSON.parse(localStorage.getItem(k)); }
+  console.log('Export demo users:', dump); alert('Revisá la consola (F12)');
+});
+
+mostrarStats();
+</script>
+</body>
+</html>

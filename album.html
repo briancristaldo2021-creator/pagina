@@ -25,31 +25,22 @@
     transition: opacity 0.5s;
     overflow: hidden;
 }
-#completado-overlay.visible {
-    opacity: 1;
-    pointer-events: all;
-}
+#completado-overlay.visible { opacity: 1; pointer-events: all; }
 #completado-overlay h1 {
     font-size: 3rem;
     animation: parpadeo 1s infinite alternate;
     color: gold;
     text-shadow: 0 0 10px #fff, 0 0 20px yellow;
 }
-#completado-overlay p {
-    font-size: 1.8rem;
-    text-align: center;
-}
-#completado-overlay canvas {
-    position: absolute;
-    top:0; left:0;
-}
+#completado-overlay p { font-size: 1.8rem; text-align: center; }
+#completado-overlay canvas { position: absolute; top:0; left:0; }
 @keyframes parpadeo {
     0% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.8; transform: scale(1.1); }
     100% { opacity: 1; transform: scale(1); }
 }
 
-/* Overlay de mensajes QR o botón */
+/* Overlay de mensajes */
 #overlay-msg {
     position: fixed;
     top:50%; left:50%;
@@ -74,71 +65,184 @@
     color:black;
     font-weight:bold;
 }
+
+/* Panel de usuario */
+#panel-usuario {
+    display:none;
+    position: fixed;
+    top:50%; left:50%;
+    transform: translate(-50%,-50%);
+    background: #111;
+    color: #fff;
+    padding:2rem;
+    border-radius:15px;
+    z-index:10000;
+    width: 300px;
+    text-align:center;
+}
+#panel-usuario input {
+    width: 90%;
+    padding:0.5rem;
+    margin:0.5rem 0;
+    border-radius:5px;
+    border:none;
+    font-size:1rem;
+}
+#panel-usuario button {
+    padding:0.5rem 1rem;
+    margin-top:1rem;
+    border:none;
+    border-radius:5px;
+    background: gold;
+    color:black;
+    font-weight:bold;
+    cursor:pointer;
+}
+#avatar-preview {
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    margin-bottom:10px;
+    object-fit: cover;
+    border:2px solid gold;
+}
 </style>
 </head>
 <body>
 
 <!-- Logo -->
 <div id="logo-container">
-    <a href="index.html">
-        <img src="https://i.ibb.co/781Qj0J/logo.png" alt="Logo Los LCDM" id="logo">
-    </a>
+  <a href="index.html">
+    <img src="https://i.ibb.co/781Qj0J/logo.png" alt="Logo Los LCDM" id="logo">
+  </a>
 </div>
 
 <!-- Barra superior -->
 <div id="barra-superior">
-    <span id="usuarioActivo"></span>
-    <span id="contador">0 / 5 Coleccion</span>
-    <div style="position: relative; display: inline-block;">
-        <button id="btnAyuda">Ayuda</button>
-        <div id="tooltipAyuda">
-            <div class="tooltipFlecha"></div>
-            <div class="tooltipContenido">
-                <h3>Ayuda / Reglas</h3>
-                <p>
-                    1. Puedes coleccionar hasta 5 figuritas por día.<br>
-                    2. Haz clic en cada figurita para ver su contenido.<br>
-                    3. ¡Disfruta del álbum y comparte con tus amigos!<br>
-                    4. Continúa agregando más reglas si lo deseas.<br>
-                    5. Personaliza todo el contenido.<br>
-                    6. Agrega imágenes si quieres.
-                </p>
-            </div>
-        </div>
+  <span id="usuarioActivo"></span>
+  <span id="contador">0 / 5 Colección</span>
+  <div style="position: relative; display: inline-block;">
+    <button id="btnAyuda">Ayuda</button>
+    <div id="tooltipAyuda">
+      <div class="tooltipFlecha"></div>
+      <div class="tooltipContenido">
+        <h3>Ayuda / Reglas</h3>
+        <p>
+          1. Puedes coleccionar hasta 5 figuritas por día.<br>
+          2. Haz clic en cada figurita para ver su contenido.<br>
+          3. ¡Disfruta del álbum y comparte con tus amigos!<br>
+          4. Continúa agregando más reglas si lo deseas.<br>
+          5. Personaliza todo el contenido.<br>
+          6. Agrega imágenes si quieres.
+        </p>
+      </div>
     </div>
-    <button id="btnReiniciar">&#127873; Canjear Premio</button>
-    <button id="btnLogout">Cerrar Sesión</button>
+  </div>
+  <button id="btnReiniciar">&#127873; Canjear Premio</button>
+  <button id="btnLogout">Cerrar Sesión</button>
+  <a href="ranking.html" style="margin-left:10px;color:yellow">🏆 Ranking</a>
+  <button id="btnPanel" style="margin-left:10px;color:orange;background:none;border:none;cursor:pointer;">⚙️ Panel Cofundador</button>
 </div>
 
 <!-- Álbum -->
 <div id="album-container">
-    <h1>Mi Propia Coleccion</h1>
-    <div class="figuritas" id="figuritasContainer"></div>
+  <h1>Mi Propia Colección</h1>
+  <div class="figuritas" id="figuritasContainer"></div>
 </div>
 
 <!-- Escaneo QR -->
 <div class="qr-section">
-    <div id="qr-reader"></div>
-    <button id="btnScanQR" onclick="iniciarScanner()">&#128247; Coleccionar QR</button>
+  <div id="qr-reader"></div>
+  <button id="btnScanQR" onclick="iniciarScanner()">&#128247; Coleccionar QR</button>
 </div>
 
 <!-- Toast -->
 <div id="toast"></div>
 <div id="completado-overlay"></div>
 
-<!-- Overlay mensajes QR -->
+<!-- Overlay mensajes -->
 <div id="overlay-msg">
-    <div id="overlay-msg-text"></div>
-    <button id="overlay-msg-close">Cerrar</button>
+  <div id="overlay-msg-text"></div>
+  <button id="overlay-msg-close">Cerrar</button>
 </div>
 
-<!-- Librerías -->
+<!-- Panel de usuario -->
+<div id="panel-usuario">
+  <h2>Mi Panel</h2>
+  <img id="avatar-preview" src="https://i.ibb.co/781Qj0J/logo.png" alt="Avatar">
+  <input type="text" id="nuevoNombre" placeholder="Nuevo nombre">
+  <input type="password" id="nuevaClave" placeholder="Nueva clave">
+  <input type="file" id="nuevoAvatar" accept="image/*">
+  <button id="btnGuardarCambios">Guardar Cambios</button>
+  <button id="btnCerrarPanel">Cerrar Panel</button>
+</div>
+
+<!-- Librerías externas -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
 
-<!-- JS del proyecto -->
+<!-- Scripts del proyecto -->
 <script src="codigos.js"></script>
 <script src="qr.js"></script>
 <script src="script.js"></script>
+
+<script>
+// ===== Panel de usuario =====
+const btnPanel = document.getElementById('btnPanel');
+const panelUsuario = document.getElementById('panel-usuario');
+const btnCerrarPanel = document.getElementById('btnCerrarPanel');
+const btnGuardarCambios = document.getElementById('btnGuardarCambios');
+const avatarPreview = document.getElementById('avatar-preview');
+const inputAvatar = document.getElementById('nuevoAvatar');
+const inputNombre = document.getElementById('nuevoNombre');
+const inputClave = document.getElementById('nuevaClave');
+const usuarioActivo = document.getElementById('usuarioActivo');
+
+let usuario = JSON.parse(localStorage.getItem('usuario')) || {nombre:'Cofundador', clave:'1234', avatar:'https://i.ibb.co/781Qj0J/logo.png'};
+
+// Mostrar usuario activo
+function mostrarUsuario(){
+    usuarioActivo.textContent = usuario.nombre;
+    avatarPreview.src = usuario.avatar;
+}
+mostrarUsuario();
+
+btnPanel.addEventListener('click', () => {
+    panelUsuario.style.display = 'block';
+    inputNombre.value = usuario.nombre;
+    inputClave.value = usuario.clave;
+});
+
+btnCerrarPanel.addEventListener('click', () => {
+    panelUsuario.style.display = 'none';
+});
+
+inputAvatar.addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(file){
+        const reader = new FileReader();
+        reader.onload = ()=> avatarPreview.src = reader.result;
+        reader.readAsDataURL(file);
+    }
+});
+
+btnGuardarCambios.addEventListener('click', ()=>{
+    usuario.nombre = inputNombre.value || usuario.nombre;
+    usuario.clave = inputClave.value || usuario.clave;
+    usuario.avatar = avatarPreview.src;
+    localStorage.setItem('usuario', JSON.stringify(usuario));
+    mostrarUsuario();
+    panelUsuario.style.display = 'none';
+    alert('Cambios guardados con éxito!');
+});
+
+// ===== Logout =====
+document.getElementById('btnLogout').addEventListener('click', ()=>{
+    localStorage.removeItem('usuario');
+    alert('Sesión cerrada');
+    location.reload();
+});
+</script>
+
 </body>
 </html>

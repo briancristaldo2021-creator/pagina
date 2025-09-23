@@ -13,17 +13,63 @@
 <form id="registroForm">
     <input type="text" id="usuario" placeholder="Usuario" required>
     <input type="password" id="password" placeholder="Contraseña" required>
+
+    <div style="margin:10px 0;">
+      <label>Elegí un avatar:</label>
+      <div id="avatarChoices" style="display:flex;gap:10px;margin-top:8px"></div>
+      <p style="font-size:0.9rem;color:#ccc">O subí uno (max 200KB)</p>
+      <input type="file" id="avatarUpload" accept="image/*">
+    </div>
+
     <button type="submit">Registrarse</button>
 </form>
 <p id="mensaje"></p>
 <p>¿Ya tenés cuenta? <a href="index.html">Login</a></p>
 
 <script>
-document.getElementById("registroForm").addEventListener("submit", e => {
+// Avatares por defecto (colocalos en /img/ o usa links)
+const avatarDefaultList = [
+  'img/avatar1.png','img/avatar2.png','img/avatar3.png','img/avatar4.png'
+];
+
+function renderAvatarChoices(){
+  const cont = document.getElementById('avatarChoices');
+  avatarDefaultList.forEach(src=>{
+    const img = document.createElement('img');
+    img.src = src;
+    img.style.width = '60px';
+    img.style.height = '60px';
+    img.style.borderRadius = '50%';
+    img.style.cursor = 'pointer';
+    img.style.border = '2px solid transparent';
+    img.addEventListener('click', ()=>{
+      // desmarcar
+      document.querySelectorAll('#avatarChoices img').forEach(i=> i.style.border='2px solid transparent');
+      img.style.border = '2px solid lime';
+      img.dataset.selected = '1';
+      img.dataset.src = src;
+    });
+    cont.appendChild(img);
+  });
+}
+
+renderAvatarChoices();
+
+// Helper convertir archivo a base64
+function fileToBase64(file){
+  return new Promise((res, rej)=>{
+    const reader = new FileReader();
+    reader.onload = () => res(reader.result);
+    reader.onerror = e => rej(e);
+    reader.readAsDataURL(file);
+  });
+}
+
+document.getElementById('registroForm').addEventListener('submit', async e => {
   e.preventDefault();
-  const usuario = document.getElementById("usuario").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const mensaje = document.getElementById("mensaje");
+  const usuario = document.getElementById('usuario').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const mensaje = document.getElementById('mensaje');
 
   if(!usuario || !password){
     mensaje.textContent = "Completa todos los campos";
@@ -38,7 +84,22 @@ document.getElementById("registroForm").addEventListener("submit", e => {
     return;
   }
 
-  localStorage.setItem(key, JSON.stringify({usuario, password, figuritas: []}));
+  // determinar avatar
+  let avatar = null;
+  const uploaded = document.getElementById('avatarUpload').files[0];
+  if(uploaded){
+    try{
+      const b64 = await fileToBase64(uploaded);
+      avatar = b64;
+    }catch(err){ console.error(err); }
+  } else {
+    const selected = document.querySelector('#avatarChoices img[style*="lime"]') || document.querySelector('#avatarChoices img');
+    avatar = selected ? selected.src : '';
+  }
+
+  // guardar estructura con campos nuevos
+  const userObj = { usuario, password, figuritas: [], avatar: avatar || '', puntos:0, logros: [], mensajes: [], coins: 50 };
+  localStorage.setItem(key, JSON.stringify(userObj));
   localStorage.setItem("usuarioActivo", usuario);
   window.location.href = "album.html";
 });

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ranking</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div style="max-width:900px;margin:20px auto;padding:20px;background:#111;border-radius:12px">
+  <a href="album.html">← Volver</a>
+  <h1>Ranking de Jugadores</h1>
+  <table id="tablaRanking" style="width:100%;border-collapse:collapse;color:#00ffff">
+    <thead><tr style="border-bottom:1px solid #222"><th>Pos</th><th>Avatar</th><th>Usuario</th><th>Puntos</th><th>Figuritas</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script>
+const tbody = document.querySelector('#tablaRanking tbody');
+const jugadores = [];
+for(let i=0;i<localStorage.length;i++){
+  const key = localStorage.key(i);
+  if(key.startsWith('user_')){
+    const datos = JSON.parse(localStorage.getItem(key));
+    jugadores.push({usuario:datos.usuario, puntos:datos.puntos || datos.figuritas.length, avatar: datos.avatar || 'img/default.png', figuritas: datos.figuritas || []});
+  }
+}
+
+jugadores.sort((a,b)=>b.puntos - a.puntos);
+
+jugadores.forEach((j, idx)=>{
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${idx+1}</td><td><img src="${j.avatar}" style="width:40px;height:40px;border-radius:50%"></td><td><a href="perfil.html?user=${encodeURIComponent(j.usuario)}">${j.usuario}</a></td><td>${j.puntos}</td><td>${j.figuritas.length}</td>`;
+  tbody.appendChild(tr);
+});
+</script>
+</body>
+</html>
+

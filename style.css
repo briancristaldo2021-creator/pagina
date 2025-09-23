@@ -250,3 +250,18 @@ body {
     .figurita img { width: 60px; height: 60px; }
     #barra-superior { flex-direction: column; gap: 10px; }
 }
+/* Agregados para perfil, ranking y panel (pequeños ajustes) */
+a { color:#00ffff; text-decoration:none }
+button { cursor:pointer }
+
+/* Tabla ranking */
+table#tablaRanking td, table#tablaRanking th { padding:8px; text-align:left }
+
+/* Mensajes en perfil */
+#mensajesContainer div { color:#ddd }
+
+/* Ajuste responsive rápido */
+@media (max-width:600px){
+  #perfilFiguritas img { width:50px; height:50px }
+  .figurita { width:90px; height:120px }
+}

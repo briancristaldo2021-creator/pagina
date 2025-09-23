@@ -1,0 +1,77 @@
+<!-- Botón en la barra superior -->
+<button id="btnPerfil" style="margin-left:10px;color:orange;background:none;border:none;cursor:pointer;">⚙️ Perfil</button>
+
+<!-- Panel de usuario -->
+<div id="panel-perfil" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+     background:#111; color:#fff; padding:2rem; border-radius:15px; z-index:10000; width:300px; text-align:center;">
+  <h2>Mi Perfil</h2>
+  <img id="avatar-preview" src="https://i.ibb.co/781Qj0J/logo.png" alt="Avatar" style="width:80px; height:80px; border-radius:50%; margin-bottom:10px; object-fit:cover; border:2px solid gold;">
+  <input type="text" id="nuevoNombre" placeholder="Nuevo nombre" style="width:90%; padding:0.5rem; margin:0.5rem 0; border-radius:5px; border:none; font-size:1rem;">
+  <input type="password" id="nuevaClave" placeholder="Nueva clave" style="width:90%; padding:0.5rem; margin:0.5rem 0; border-radius:5px; border:none; font-size:1rem;">
+  <input type="file" id="nuevoAvatar" accept="image/*" style="margin:0.5rem 0;">
+  <button id="btnGuardarCambios" style="padding:0.5rem 1rem; margin-top:1rem; border:none; border-radius:5px; background:gold; color:black; font-weight:bold; cursor:pointer;">Guardar Cambios</button>
+  <button id="btnCerrarPerfil" style="padding:0.5rem 1rem; margin-top:0.5rem; border:none; border-radius:5px; background:red; color:white; font-weight:bold; cursor:pointer;">Cerrar</button>
+</div>
+
+<script>
+const btnPerfil = document.getElementById('btnPerfil');
+const panelPerfil = document.getElementById('panel-perfil');
+const btnCerrarPerfil = document.getElementById('btnCerrarPerfil');
+const btnGuardarCambios = document.getElementById('btnGuardarCambios');
+const avatarPreview = document.getElementById('avatar-preview');
+const inputAvatar = document.getElementById('nuevoAvatar');
+const inputNombre = document.getElementById('nuevoNombre');
+const inputClave = document.getElementById('nuevaClave');
+const usuarioActivo = document.getElementById('usuarioActivo');
+
+// Cargar usuario desde localStorage o crear por defecto
+let usuario = JSON.parse(localStorage.getItem('usuario')) || {nombre:'Cofundador', clave:'1234', avatar:'https://i.ibb.co/781Qj0J/logo.png'};
+
+// Mostrar usuario activo en barra superior
+function mostrarUsuario(){
+    usuarioActivo.textContent = usuario.nombre;
+    avatarPreview.src = usuario.avatar;
+}
+mostrarUsuario();
+
+// Abrir panel
+btnPerfil.addEventListener('click', () => {
+    panelPerfil.style.display = 'block';
+    inputNombre.value = usuario.nombre;
+    inputClave.value = usuario.clave;
+    avatarPreview.src = usuario.avatar;
+});
+
+// Cerrar panel
+btnCerrarPerfil.addEventListener('click', () => {
+    panelPerfil.style.display = 'none';
+});
+
+// Previsualizar avatar al seleccionar
+inputAvatar.addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(file){
+        const reader = new FileReader();
+        reader.onload = ()=> avatarPreview.src = reader.result;
+        reader.readAsDataURL(file);
+    }
+});
+
+// Guardar cambios
+btnGuardarCambios.addEventListener('click', ()=>{
+    usuario.nombre = inputNombre.value || usuario.nombre;
+    usuario.clave = inputClave.value || usuario.clave;
+    usuario.avatar = avatarPreview.src;
+    localStorage.setItem('usuario', JSON.stringify(usuario));
+    mostrarUsuario();
+    panelPerfil.style.display = 'none';
+    alert('Perfil actualizado correctamente!');
+});
+
+// Logout
+document.getElementById('btnLogout').addEventListener('click', ()=>{
+    localStorage.removeItem('usuario');
+    alert('Sesión cerrada');
+    location.reload();
+});
+</script>

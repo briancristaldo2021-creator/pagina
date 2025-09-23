@@ -1,3 +1,4 @@
+// script.js mejorado - controla album, avatar, intercambio y tienda demo
 document.addEventListener("DOMContentLoaded", () => {
   const usuarioActivo = localStorage.getItem("usuarioActivo");
   if (!usuarioActivo) {
@@ -5,15 +6,16 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Mostrar usuario con emoji
-  document.getElementById("usuarioActivo").innerHTML =
-    '<span style="color: green;">&#128104;</span> ' + usuarioActivo;
-
+  // Mostrar avatar y nombre
   const key = "user_" + usuarioActivo;
   const datos = JSON.parse(localStorage.getItem(key)) || {};
   datos.figuritas = datos.figuritas || [];
+  localStorage.setItem(key, JSON.stringify(datos));
 
-  // Renderizar figuritas
+  const avatarHtml = `<img src="${datos.avatar||'img/default.png'}" style="width:36px;height:36px;border-radius:50%;vertical-align:middle;margin-right:8px">`;
+  document.getElementById("usuarioActivo").innerHTML = avatarHtml + '<span style="color: green;">&#128104;</span> ' + usuarioActivo;
+
+  // Render figuritas
   const cont = document.getElementById("figuritasContainer");
   cont.innerHTML = "";
   figuritasData.forEach(fig => {
@@ -21,16 +23,54 @@ document.addEventListener("DOMContentLoaded", () => {
     div.className = "figurita";
     div.id = fig.id;
     div.innerHTML = `<img src="${fig.imgBloqueada}" alt="${fig.nombre}"><span>${fig.nombre}</span>`;
+    // si lo tiene
     if (datos.figuritas.includes(fig.id)) {
       div.classList.add("coleccionada");
       div.querySelector("img").src = fig.imgColor;
     }
+
+    // click abre opciones: ver perfil de dueño (si otro), ofrecer/intercambiar si es mio
+    div.addEventListener('click', ()=>{
+      // si es mio, abrir modal de opciones
+      if(datos.figuritas.includes(fig.id)){
+        const compartir = confirm('Queres ofertar/intercambiar esta figurita a otro usuario?');
+        if(compartir){
+          const receptor = prompt('Usuario receptor (exacto)');
+          if(receptor){
+            const keyR = 'user_' + receptor;
+            const datosR = JSON.parse(localStorage.getItem(keyR));
+            if(!datosR){ alert('Usuario receptor no existe'); return; }
+            // transferencia inmediata (demo)
+            datos.figuritas = datos.figuritas.filter(f=>f!==fig.id);
+            datosR.figuritas = datosR.figuritas || [];
+            datosR.figuritas.push(fig.id);
+            localStorage.setItem(key, JSON.stringify(datos));
+            localStorage.setItem(keyR, JSON.stringify(datosR));
+            alert('Figurita transferida (demo)');
+            location.reload();
+          }
+        }
+      } else {
+        // mostrar perfil de quien la tiene? busco en usuarios
+        let owner = null;
+        for(let i=0;i<localStorage.length;i++){
+          const k = localStorage.key(i);
+          if(k.startsWith('user_')){
+            const d = JSON.parse(localStorage.getItem(k));
+            if((d.figuritas||[]).includes(fig.id)){ owner = d.usuario; break; }
+          }
+        }
+        if(owner) window.location.href = 'perfil.html?user=' + encodeURIComponent(owner);
+        else alert('Nadie la tiene todavía');
+      }
+    });
+
     cont.appendChild(div);
   });
 
   actualizarContador();
 
-  // Botón Canjear Premio
+  // Canjear premio
   document.getElementById("btnReiniciar").addEventListener("click", () => {
     if (datos.figuritas.length === figuritasData.length) {
       mostrarCelebracionConPremio();
@@ -45,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "index.html";
   });
 
-  // Tooltip de ayuda
+  // Ayuda tooltip
   const btnAyuda = document.getElementById("btnAyuda");
   const tooltipAyuda = document.getElementById("tooltipAyuda");
   btnAyuda.addEventListener("click", () => {
@@ -57,12 +97,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Función para actualizar el contador
-  function actualizarContador() {
-    document.getElementById("contador").textContent =
-      `${datos.figuritas.length} / ${figuritasData.length} figuritas`;
-  }
+  // tienda demo: comprar sobre
+  const tiendaBtn = document.createElement('button');
+  tiendaBtn.textContent = 'Comprar sobre (30 coins)';
+  tiendaBtn.style.marginLeft = '10px';
+  tiendaBtn.onclick = ()=>{
+    if((datos.coins||0) < 30){ alert('No tenés coins suficientes'); return; }
+    datos.coins = (datos.coins||0) - 30;
+    // entregar figurita aleatoria que no tenga
+    const faltantes = figuritasData.map(f=>f.id).filter(id=> !datos.figuritas.includes(id));
+    if(faltantes.length === 0){ alert('Ya tenés todo'); return; }
+    const ele = faltantes[Math.floor(Math.random()*faltantes.length)];
+    datos.figuritas.push(ele);
+    localStorage.setItem(key, JSON.stringify(datos));
+    alert('Abriste un sobre y obtuviste ' + ele);
+    location.reload();
+  };
+  document.getElementById('barra-superior').appendChild(tiendaBtn);
 
+  // Exponer actualizarContador
+  function actualizarContador() {
+    document.getElementById("contador").textContent = `${datos.figuritas.length} / ${figuritasData.length} figuritas`;
+  }
   window.actualizarContador = actualizarContador;
 });
 
@@ -80,11 +136,10 @@ document.getElementById("overlay-msg-close").addEventListener("click", () => {
 // === Celebración con premio con música de YouTube ===
 function mostrarCelebracionConPremio() {
   const overlay = document.getElementById("completado-overlay");
-
   overlay.innerHTML = `
-    <h1>&#127881; ¡Felicidades ${localStorage.getItem("usuarioActivo")}! &#127881;</h1>
+    <h1>?? ¡Felicidades ${localStorage.getItem("usuarioActivo")}! ??</h1>
     <p>¡Completaste tu Álbum!</p>
-    <p style="font-size:1.5rem; color:yellow;">Tu premio: <b>CODIGO1234</b></p>
+    <p style="font-size:1.2rem;color:yellow;">Tu premio: <b>CODIGO1234</b></p>
     <canvas id="confeti"></canvas>
     <canvas id="fuegos"></canvas>
 
