@@ -24,6 +24,17 @@
 #panel-perfil button { padding:0.5rem 1rem; margin-top:1rem; border:none; border-radius:5px; background: gold; color:black; font-weight:bold; cursor:pointer; }
 #avatar-preview { width:80px; height:80px; border-radius:50%; margin-bottom:10px; object-fit: cover; border:2px solid gold; }
 #avatar-barra { width:30px; height:30px; border-radius:50%; border:1px solid gold; object-fit:cover; }
+
+/* Panel Cofundador */
+#panel-cofundador { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#111; color:#fff; padding:2rem; border-radius:15px; z-index:10001; width:400px; text-align:center; }
+#panel-cofundador input { width:80%; padding:0.5rem; margin:0.5rem 0; border-radius:5px; border:none; font-size:1rem; }
+#panel-cofundador button { padding:0.5rem 1rem; margin-top:1rem; border:none; border-radius:5px; background:gold; color:black; font-weight:bold; cursor:pointer; }
+
+/* Lista perfiles públicos */
+#perfilesPublicos { position:fixed; bottom:10px; right:10px; background:#222; padding:10px; border-radius:10px; color:#fff; max-height:300px; overflow-y:auto; width:200px; }
+#perfilesPublicos h4 { margin:0 0 5px 0; color:gold; }
+#listaPublicos div { display:flex; align-items:center; gap:5px; cursor:pointer; }
+#listaPublicos div img { width:25px; height:25px; border-radius:50%; border:1px solid gold; }
 </style>
 </head>
 <body>
@@ -59,6 +70,7 @@
   <button id="btnLogout">Cerrar Sesión</button>
   <a href="ranking.html" style="color:yellow;">🏆 Ranking</a>
   <button id="btnPerfil" style="color:orange;background:none;border:none;cursor:pointer;">⚙️ Perfil</button>
+  <button id="btnCofundador" style="display:none;color:red;background:none;border:none;cursor:pointer;">👑 Panel Cofundador</button>
 </div>
 
 <!-- Álbum -->
@@ -94,10 +106,27 @@
   <button id="btnCerrarPerfil">Cerrar</button>
 </div>
 
+<!-- Panel Cofundador -->
+<div id="panel-cofundador">
+  <h2>Panel Cofundador 🔒</h2>
+  <input type="password" id="adminPass" placeholder="Contraseña admin">
+  <button id="btnAdminLogin">Ingresar</button>
+  <button id="btnCerrarAdmin">Cerrar</button>
+  <div id="adminAcciones" style="margin-top:1rem;display:none;">
+    <button id="btnResetAll">Resetear demo (borrar usuarios)</button>
+    <button id="btnExport">Exportar usuarios (console)</button>
+  </div>
+</div>
+
+<!-- Lista perfiles públicos -->
+<div id="perfilesPublicos">
+  <h4>Perfiles Públicos</h4>
+  <div id="listaPublicos"></div>
+</div>
+
 <!-- Librerías externas -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
-
 <script src="codigos.js"></script>
 <script src="qr.js"></script>
 <script src="script.js"></script>
@@ -117,7 +146,7 @@ const avatarBarra = document.getElementById('avatar-barra');
 const perfilPublicoCheck = document.getElementById('perfilPublicoCheck');
 const perfilBio = document.getElementById('perfilBio');
 
-// Cargar usuario
+// Usuario
 let usuario = JSON.parse(localStorage.getItem('usuario')) || {nombre:'Cofundador', clave:'1234', avatar:'https://i.ibb.co/781Qj0J/logo.png', puntos:0, publico:false, bio:''};
 
 // Ranking
@@ -171,6 +200,7 @@ btnGuardarCambios.addEventListener('click',()=>{
     mostrarUsuario();
     panelPerfil.style.display='none';
     alert('Perfil actualizado correctamente!');
+    actualizarPerfilesPublicos();
 });
 
 // Logout
@@ -180,12 +210,83 @@ document.getElementById('btnLogout').addEventListener('click',()=>{
     location.reload();
 });
 
-// Ejemplo: sumar puntos al coleccionar QR
+// Sumar puntos
 function sumarPuntos(puntos=10){
     usuario.puntos=(usuario.puntos||0)+puntos;
     localStorage.setItem('usuario',JSON.stringify(usuario));
     mostrarUsuario();
 }
+
+// ===== Botón misterioso sobre logo =====
+const btnCofundador = document.getElementById('btnCofundador');
+document.getElementById('logo').addEventListener('mouseenter',()=>{
+  if(usuario && (usuario.nombre==='admin'||usuario.nombre==='cofundador')){
+    btnCofundador.style.display='inline-block';
+  }
+});
+
+// ===== Panel Cofundador =====
+const panelCofundador = document.getElementById('panel-cofundador');
+const btnAdminLogin = document.getElementById('btnAdminLogin');
+const btnCerrarAdmin = document.getElementById('btnCerrarAdmin');
+const adminAcciones = document.getElementById('adminAcciones');
+
+btnCofundador.addEventListener('click',()=>panelCofundador.style.display='block');
+btnCerrarAdmin.addEventListener('click',()=>panelCofundador.style.display='none');
+
+btnAdminLogin.addEventListener('click',()=>{
+  const pass = document.getElementById('adminPass').value;
+  if(pass==='admin123'){ // Cambiás aquí tu contraseña real
+    adminAcciones.style.display='block';
+    alert('Bienvenido Cofundador!');
+  }else{
+    alert('Contraseña incorrecta');
+  }
+});
+
+// Acciones admin
+document.getElementById('btnResetAll').addEventListener('click', ()=>{
+  if(confirm('Borrar todos los users?')){
+    const keys = [];
+    for(let i=0;i<localStorage.length;i++){
+      const k = localStorage.key(i);
+      if(k && k.startsWith('user_')) keys.push(k);
+    }
+    keys.forEach(k=> localStorage.removeItem(k));
+    alert('Usuarios eliminados'); location.reload();
+  }
+});
+
+document.getElementById('btnExport').addEventListener('click', ()=>{
+  const dump = {};
+  for(let i=0;i<localStorage.length;i++){
+    const k = localStorage.key(i);
+    if(k.startsWith('user_')) dump[k]=JSON.parse(localStorage.getItem(k));
+  }
+  console.log('Usuarios export:', dump);
+  alert('Revisá la consola (F12)');
+});
+
+// Mostrar perfiles públicos
+function actualizarPerfilesPublicos(){
+  const lista = document.getElementById('listaPublicos');
+  lista.innerHTML='';
+  for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    if(key.startsWith('user_')){
+      const u = JSON.parse(localStorage.getItem(key));
+      if(u.publico){
+        const div = document.createElement('div');
+        div.style.display='flex'; div.style.alignItems='center'; div.style.gap='5px';
+        div.innerHTML = `<img src="${u.avatar}"><span>${u.nombre}</span>`;
+        div.title = u.bio || '';
+        lista.appendChild(div);
+      }
+    }
+  }
+}
+actualizarPerfilesPublicos();
 </script>
+
 </body>
 </html>

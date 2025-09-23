@@ -10,7 +10,7 @@
   body { 
     font-family:'Arial', sans-serif; 
     background:#0d0d0d; 
-    color:#00ffff; 
+    color:#00ffffaA; 
     display:flex; 
     justify-content:center; 
     align-items:center; 
@@ -69,6 +69,14 @@
   }
   #login-container button:hover { background:#009999; color:white; }
   #mensaje { margin-top:10px; font-weight:bold; }
+
+  /* Acceso Cofundador */
+  #accesoCofundador { margin-top:20px; text-align:center; }
+  #accesoCofundador button { 
+    background:gold; color:#000; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:bold;
+    transition:0.3s; box-shadow: 0 0 10px gold;
+  }
+  #accesoCofundador button:hover { background:#ffdd00; transform: scale(1.05); }
 </style>
 </head>
 <body>
@@ -84,6 +92,7 @@
   <p>Registrate o inicia sesión para comenzar</p>
   <button onclick="cerrarBienvenida()">Comenzar</button>
 </div>
+
 <!-- Login / Registro -->
 <div id="login-container">
   <h2>Registro / Iniciar</h2>
@@ -92,10 +101,14 @@
   <button onclick="registrarOLogin()">Ingresar</button>
   <p id="mensaje"></p>
   <p>¿No tenés cuenta? <a href="registro.html">Registrate aquí</a></p>
+  
+  <!-- Acceso Cofundador -->
+  <div id="accesoCofundador">
+    <button id="btnEntrarCofundador">Acceso Cofundador 🔒</button>
+  </div>
 </div>
 
 <script>
-
 // ==============================
 // Overlay de bienvenida
 // ==============================
@@ -109,7 +122,7 @@ function cerrarBienvenida() {
 }
 
 // ==============================
-// Registro / Login
+// Registro / Login normal
 // ==============================
 function registrarOLogin() {
   const usuario = document.getElementById('usuario').value.trim();
@@ -135,18 +148,21 @@ function registrarOLogin() {
           mensaje.style.color = "red";
       }
   } else {
-      localStorage.setItem(key, JSON.stringify({usuario, password, figuritas: []}));
+      localStorage.setItem(key, JSON.stringify({usuario, password, figuritas: [], coins:0, avatar:'https://i.ibb.co/781Qj0J/logo.png', publico:false, bio:''}));
       localStorage.setItem('usuarioActivo', usuario);
       window.location.href = 'album.html';
   }
 }
 
 // Enter para enviar
-document.getElementById('password').addEventListener('keypress', e => {
-  if(e.key === 'Enter') registrarOLogin();
-});
-document.getElementById('usuario').addEventListener('keypress', e => {
-  if(e.key === 'Enter') registrarOLogin();
+document.getElementById('password').addEventListener('keypress', e => { if(e.key==='Enter') registrarOLogin(); });
+document.getElementById('usuario').addEventListener('keypress', e => { if(e.key==='Enter') registrarOLogin(); });
+
+// ==============================
+// Acceso Cofundador
+// ==============================
+document.getElementById('btnEntrarCofundador').addEventListener('click', ()=>{
+    window.location.href='panel.html';
 });
 </script>
 
