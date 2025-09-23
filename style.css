@@ -256,46 +256,13 @@ body {
     100% { opacity: 1; transform: scale(1); }
 }
 
-/* Panel Cofundador */
-#panel-cofundador {
-    display:none;
-    position:fixed;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    background:#000;
-    color:#00ffff;
-    padding:2rem;
-    border-radius:15px;
-    z-index:10001;
-    width:400px;
-    text-align:center;
-    box-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff;
-}
-#panel-cofundador input, #panel-cofundador button {
-    margin:5px 0;
-    padding: 0.5rem;
-    border-radius: 6px;
-    border:none;
-}
-#panel-cofundador button {
-    background: linear-gradient(45deg, #ff00ff, #00ffff);
-    color:#000;
-    font-weight:bold;
-    cursor:pointer;
-    transition: all 0.3s;
-}
-#panel-cofundador button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff;
-}
-
 /* Responsivo */
 @media (max-width: 600px) {
     .figuritas { gap: 10px; }
     .figurita { width: 90px; height: 120px; }
     .figurita img { width: 60px; height: 60px; }
     #barra-superior { flex-direction: column; gap: 10px; }
+    #tooltipAyuda { width: 220px; }
 }
 </style>
 </head>
@@ -334,35 +301,6 @@ body {
 <!-- Toast y Overlay -->
 <div id="toast"></div>
 <div id="completado-overlay"><h1>¡Colección Completa!</h1></div>
-
-<!-- Panel Cofundador -->
-<div id="panel-cofundador">
-  <h2>Panel Cofundador 🔒</h2>
-  <input type="password" id="adminPass" placeholder="Contraseña admin">
-  <button id="btnAdminLogin">Ingresar</button>
-  <button id="btnCerrarAdmin">Cerrar</button>
-  <div id="adminAcciones" style="margin-top:1rem;display:none;">
-    <button id="btnResetAll">Resetear demo</button>
-    <button id="btnExport">Exportar usuarios</button>
-  </div>
-</div>
-
-<script>
-const btnCofundador = document.getElementById('btnCofundador');
-const panelCofundador = document.getElementById('panel-cofundador');
-const btnCerrarAdmin = document.getElementById('btnCerrarAdmin');
-
-// Mostrar panel al click
-btnCofundador.addEventListener('click',()=>panelCofundador.style.display='block');
-btnCerrarAdmin.addEventListener('click',()=>panelCofundador.style.display='none');
-
-// Atajo Alt + A
-document.addEventListener('keydown', (e)=>{
-    if(e.altKey && e.code === 'KeyA'){
-        panelCofundador.style.display='block';
-    }
-});
-</script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
