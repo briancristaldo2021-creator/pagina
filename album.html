@@ -5,123 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LCDM COLECCION</title>
 <link rel="stylesheet" href="style.css">
-
 <style>
 /* Overlay máximo */
-#completado-overlay {
-    position: fixed;
-    top:0; left:0; width:100%; height:100%;
-    background: rgba(0,0,0,0.9);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #fff;
-    font-family: sans-serif;
-    font-size: 2rem;
-    z-index: 9999;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.5s;
-    overflow: hidden;
-}
+#completado-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; color: #fff; font-family: sans-serif; font-size: 2rem; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.5s; overflow: hidden; }
 #completado-overlay.visible { opacity: 1; pointer-events: all; }
-#completado-overlay h1 {
-    font-size: 3rem;
-    animation: parpadeo 1s infinite alternate;
-    color: gold;
-    text-shadow: 0 0 10px #fff, 0 0 20px yellow;
-}
+#completado-overlay h1 { font-size: 3rem; animation: parpadeo 1s infinite alternate; color: gold; text-shadow: 0 0 10px #fff, 0 0 20px yellow; }
 #completado-overlay p { font-size: 1.8rem; text-align: center; }
 #completado-overlay canvas { position: absolute; top:0; left:0; }
-@keyframes parpadeo {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.8; transform: scale(1.1); }
-    100% { opacity: 1; transform: scale(1); }
-}
+@keyframes parpadeo { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
 
 /* Overlay de mensajes */
-#overlay-msg {
-    position: fixed;
-    top:50%; left:50%;
-    transform: translate(-50%,-50%);
-    background: rgba(0,0,0,0.95);
-    color: #fff;
-    font-size:1.5rem;
-    padding:2rem;
-    border-radius:15px;
-    z-index:99999;
-    display:none;
-    text-align:center;
-}
-#overlay-msg button {
-    margin-top:1rem;
-    padding:0.5rem 1rem;
-    font-size:1rem;
-    cursor:pointer;
-    border:none;
-    border-radius:5px;
-    background: gold;
-    color:black;
-    font-weight:bold;
-}
+#overlay-msg { position: fixed; top:50%; left:50%; transform: translate(-50%,-50%); background: rgba(0,0,0,0.95); color: #fff; font-size:1.5rem; padding:2rem; border-radius:15px; z-index:99999; display:none; text-align:center; }
+#overlay-msg button { margin-top:1rem; padding:0.5rem 1rem; font-size:1rem; cursor:pointer; border:none; border-radius:5px; background: gold; color:black; font-weight:bold; }
 
 /* Panel de usuario */
-#panel-perfil {
-    display:none;
-    position: fixed;
-    top:50%; left:50%;
-    transform: translate(-50%,-50%);
-    background: #111;
-    color: #fff;
-    padding:2rem;
-    border-radius:15px;
-    z-index:10000;
-    width: 300px;
-    text-align:center;
-}
-#panel-perfil input {
-    width: 90%;
-    padding:0.5rem;
-    margin:0.5rem 0;
-    border-radius:5px;
-    border:none;
-    font-size:1rem;
-}
-#panel-perfil button {
-    padding:0.5rem 1rem;
-    margin-top:1rem;
-    border:none;
-    border-radius:5px;
-    background: gold;
-    color:black;
-    font-weight:bold;
-    cursor:pointer;
-}
-#avatar-preview {
-    width:80px;
-    height:80px;
-    border-radius:50%;
-    margin-bottom:10px;
-    object-fit: cover;
-    border:2px solid gold;
-}
-#avatar-barra {
-    width:30px;
-    height:30px;
-    border-radius:50%;
-    border:1px solid gold;
-    object-fit:cover;
-}
+#panel-perfil { display:none; position: fixed; top:50%; left:50%; transform: translate(-50%,-50%); background: #111; color: #fff; padding:2rem; border-radius:15px; z-index:10000; width: 300px; text-align:center; }
+#panel-perfil input, #panel-perfil textarea { width: 90%; padding:0.5rem; margin:0.5rem 0; border-radius:5px; border:none; font-size:1rem; }
+#panel-perfil button { padding:0.5rem 1rem; margin-top:1rem; border:none; border-radius:5px; background: gold; color:black; font-weight:bold; cursor:pointer; }
+#avatar-preview { width:80px; height:80px; border-radius:50%; margin-bottom:10px; object-fit: cover; border:2px solid gold; }
+#avatar-barra { width:30px; height:30px; border-radius:50%; border:1px solid gold; object-fit:cover; }
 </style>
 </head>
 <body>
 
 <!-- Logo -->
 <div id="logo-container">
-  <a href="index.html">
-    <img src="https://i.ibb.co/781Qj0J/logo.png" alt="Logo Los LCDM" id="logo">
-  </a>
+  <a href="index.html"><img src="https://i.ibb.co/781Qj0J/logo.png" alt="Logo Los LCDM" id="logo"></a>
 </div>
 
 <!-- Barra superior -->
@@ -164,11 +73,9 @@
   <button id="btnScanQR" onclick="iniciarScanner()">&#128247; Coleccionar QR</button>
 </div>
 
-<!-- Toast -->
+<!-- Toast y Overlay mensajes -->
 <div id="toast"></div>
 <div id="completado-overlay"></div>
-
-<!-- Overlay mensajes -->
 <div id="overlay-msg">
   <div id="overlay-msg-text"></div>
   <button id="overlay-msg-close">Cerrar</button>
@@ -180,6 +87,8 @@
   <img id="avatar-preview" src="https://i.ibb.co/781Qj0J/logo.png" alt="Avatar">
   <input type="text" id="nuevoNombre" placeholder="Nuevo nombre">
   <input type="password" id="nuevaClave" placeholder="Nueva clave">
+  <textarea id="perfilBio" placeholder="Escribe tu bio"></textarea>
+  <label><input type="checkbox" id="perfilPublicoCheck"> Hacer perfil público</label>
   <input type="file" id="nuevoAvatar" accept="image/*">
   <button id="btnGuardarCambios">Guardar Cambios</button>
   <button id="btnCerrarPerfil">Cerrar</button>
@@ -189,7 +98,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
 
-<!-- Scripts del proyecto -->
 <script src="codigos.js"></script>
 <script src="qr.js"></script>
 <script src="script.js"></script>
@@ -206,59 +114,78 @@ const inputNombre = document.getElementById('nuevoNombre');
 const inputClave = document.getElementById('nuevaClave');
 const usuarioActivo = document.getElementById('usuarioActivo');
 const avatarBarra = document.getElementById('avatar-barra');
+const perfilPublicoCheck = document.getElementById('perfilPublicoCheck');
+const perfilBio = document.getElementById('perfilBio');
 
-// Cargar usuario desde localStorage o crear por defecto
-let usuario = JSON.parse(localStorage.getItem('usuario')) || {nombre:'Cofundador', clave:'1234', avatar:'https://i.ibb.co/781Qj0J/logo.png'};
+// Cargar usuario
+let usuario = JSON.parse(localStorage.getItem('usuario')) || {nombre:'Cofundador', clave:'1234', avatar:'https://i.ibb.co/781Qj0J/logo.png', puntos:0, publico:false, bio:''};
 
-// Mostrar usuario activo y avatar en barra
+// Ranking
+let ranking = JSON.parse(localStorage.getItem('ranking')) || [];
+function guardarRanking() {
+    let index = ranking.findIndex(u=>u.nombre===usuario.nombre);
+    if(index>=0){ ranking[index]=usuario; } else { ranking.push(usuario); }
+    localStorage.setItem('ranking', JSON.stringify(ranking));
+}
+
+// Mostrar usuario
 function mostrarUsuario(){
     usuarioActivo.textContent = usuario.nombre;
     avatarPreview.src = usuario.avatar;
     avatarBarra.src = usuario.avatar;
+    guardarRanking();
 }
 mostrarUsuario();
 
-// Abrir panel
-btnPerfil.addEventListener('click', () => {
-    panelPerfil.style.display = 'block';
-    inputNombre.value = usuario.nombre;
-    inputClave.value = usuario.clave;
-    avatarPreview.src = usuario.avatar;
+// Abrir perfil
+btnPerfil.addEventListener('click',()=>{
+    panelPerfil.style.display='block';
+    inputNombre.value=usuario.nombre;
+    inputClave.value=usuario.clave;
+    avatarPreview.src=usuario.avatar;
+    perfilPublicoCheck.checked = usuario.publico;
+    perfilBio.value = usuario.bio || '';
 });
 
-// Cerrar panel
-btnCerrarPerfil.addEventListener('click', () => {
-    panelPerfil.style.display = 'none';
-});
+// Cerrar perfil
+btnCerrarPerfil.addEventListener('click',()=>panelPerfil.style.display='none');
 
-// Previsualizar avatar al seleccionar
-inputAvatar.addEventListener('change', (e)=>{
-    const file = e.target.files[0];
+// Previsualizar avatar
+inputAvatar.addEventListener('change',(e)=>{
+    const file=e.target.files[0];
     if(file){
-        const reader = new FileReader();
-        reader.onload = ()=> avatarPreview.src = reader.result;
+        const reader=new FileReader();
+        reader.onload=()=>avatarPreview.src=reader.result;
         reader.readAsDataURL(file);
     }
 });
 
 // Guardar cambios
-btnGuardarCambios.addEventListener('click', ()=>{
-    usuario.nombre = inputNombre.value || usuario.nombre;
-    usuario.clave = inputClave.value || usuario.clave;
-    usuario.avatar = avatarPreview.src;
-    localStorage.setItem('usuario', JSON.stringify(usuario));
+btnGuardarCambios.addEventListener('click',()=>{
+    usuario.nombre=inputNombre.value||usuario.nombre;
+    usuario.clave=inputClave.value||usuario.clave;
+    usuario.avatar=avatarPreview.src;
+    usuario.publico = perfilPublicoCheck.checked;
+    usuario.bio = perfilBio.value;
+    localStorage.setItem('usuario',JSON.stringify(usuario));
     mostrarUsuario();
-    panelPerfil.style.display = 'none';
+    panelPerfil.style.display='none';
     alert('Perfil actualizado correctamente!');
 });
 
 // Logout
-document.getElementById('btnLogout').addEventListener('click', ()=>{
+document.getElementById('btnLogout').addEventListener('click',()=>{
     localStorage.removeItem('usuario');
     alert('Sesión cerrada');
     location.reload();
 });
-</script>
 
+// Ejemplo: sumar puntos al coleccionar QR
+function sumarPuntos(puntos=10){
+    usuario.puntos=(usuario.puntos||0)+puntos;
+    localStorage.setItem('usuario',JSON.stringify(usuario));
+    mostrarUsuario();
+}
+</script>
 </body>
 </html>
