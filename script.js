@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (datos.figuritas.length === figuritasData.length) {
       mostrarCelebracionConPremio();
     } else {
-      mostrarOverlayMensaje("? Aún no completaste el álbum. ¡Sigue coleccionando figuritas!");
+      mostrarOverlayMensaje("Aún no completaste el álbum. ¡Sigue coleccionando figuritas!");
     }
   });
 

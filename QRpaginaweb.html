@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mi QR</title>
+  <!-- Librería para generar QR -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+</head>
+<body>
+  <h2>Escaneá este código QR para visitar mi página</h2>
+
+  <!-- Contenedor donde aparece el QR -->
+  <div id="qrcode"></div>
+
+  <script>
+    // Generar el QR con tu link
+    new QRCode(document.getElementById("qrcode"), {
+      text: "https://briancristaldo2021-creator.github.io/pagina/",
+      width: 200,   // ancho del QR
+      height: 200   // alto del QR
+    });
+  </script>
+</body>
+</html>
