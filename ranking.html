@@ -3,38 +3,64 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ranking</title>
+<title>Ranking LCDM</title>
 <link rel="stylesheet" href="style.css">
+<style>
+body { font-family: sans-serif; background:#111; color:#fff; text-align:center; }
+#ranking-container { max-width:500px; margin:2rem auto; background:#222; padding:1rem; border-radius:10px; }
+.ranking-item { display:flex; align-items:center; justify-content:space-between; padding:0.5rem 1rem; border-bottom:1px solid #444; }
+.ranking-item img { width:40px; height:40px; border-radius:50%; margin-right:10px; object-fit:cover; border:1px solid gold; }
+.ranking-item span { font-size:1.2rem; }
+h1 { color:gold; text-shadow:0 0 5px #fff; }
+</style>
 </head>
 <body>
-<div style="max-width:900px;margin:20px auto;padding:20px;background:#111;border-radius:12px">
-  <a href="album.html">← Volver</a>
-  <h1>Ranking de Jugadores</h1>
-  <table id="tablaRanking" style="width:100%;border-collapse:collapse;color:#00ffff">
-    <thead><tr style="border-bottom:1px solid #222"><th>Pos</th><th>Avatar</th><th>Usuario</th><th>Puntos</th><th>Figuritas</th></tr></thead>
-    <tbody></tbody>
-  </table>
-</div>
+
+<h1>🏆 Ranking LCDM</h1>
+<div id="ranking-container"></div>
+<a href="album.html" style="color:yellow;">⬅️ Volver al Álbum</a>
 
 <script>
-const tbody = document.querySelector('#tablaRanking tbody');
-const jugadores = [];
-for(let i=0;i<localStorage.length;i++){
-  const key = localStorage.key(i);
-  if(key.startsWith('user_')){
-    const datos = JSON.parse(localStorage.getItem(key));
-    jugadores.push({usuario:datos.usuario, puntos:datos.puntos || datos.figuritas.length, avatar: datos.avatar || 'img/default.png', figuritas: datos.figuritas || []});
-  }
+// ===== Datos de ejemplo =====
+// Aquí se puede guardar el ranking en localStorage o traer de tu sistema
+// Cada usuario: {nombre, avatar, puntos}
+let ranking = JSON.parse(localStorage.getItem('ranking')) || [];
+
+// Asegurarse de tener el usuario activo en ranking
+let usuario = JSON.parse(localStorage.getItem('usuario'));
+if(usuario){
+    let existente = ranking.find(u => u.nombre === usuario.nombre);
+    if(!existente){
+        ranking.push({nombre:usuario.nombre, avatar:usuario.avatar, puntos:0});
+    }
 }
 
-jugadores.sort((a,b)=>b.puntos - a.puntos);
+// Ordenar por puntos descendente
+ranking.sort((a,b)=>b.puntos - a.puntos);
 
-jugadores.forEach((j, idx)=>{
-  const tr = document.createElement('tr');
-  tr.innerHTML = `<td>${idx+1}</td><td><img src="${j.avatar}" style="width:40px;height:40px;border-radius:50%"></td><td><a href="perfil.html?user=${encodeURIComponent(j.usuario)}">${j.usuario}</a></td><td>${j.puntos}</td><td>${j.figuritas.length}</td>`;
-  tbody.appendChild(tr);
+const contenedor = document.getElementById('ranking-container');
+contenedor.innerHTML = '';
+
+// Renderizar ranking
+ranking.forEach((u,index)=>{
+    const div = document.createElement('div');
+    div.className = 'ranking-item';
+    div.innerHTML = `
+        <div style="display:flex; align-items:center;">
+            <span>${index+1}.</span>
+            <img src="${u.avatar}" alt="Avatar">
+            <span>${u.nombre}</span>
+        </div>
+        <span>${u.puntos} pts</span>
+    `;
+    contenedor.appendChild(div);
 });
+
+// ===== Actualizar puntos ejemplo =====
+// Cada vez que colecciones una figurita, puedes actualizar puntos así:
+// ranking[0].puntos += 10; 
+// localStorage.setItem('ranking', JSON.stringify(ranking));
 </script>
+
 </body>
 </html>
-

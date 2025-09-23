@@ -67,7 +67,7 @@
 }
 
 /* Panel de usuario */
-#panel-usuario {
+#panel-perfil {
     display:none;
     position: fixed;
     top:50%; left:50%;
@@ -80,7 +80,7 @@
     width: 300px;
     text-align:center;
 }
-#panel-usuario input {
+#panel-perfil input {
     width: 90%;
     padding:0.5rem;
     margin:0.5rem 0;
@@ -88,7 +88,7 @@
     border:none;
     font-size:1rem;
 }
-#panel-usuario button {
+#panel-perfil button {
     padding:0.5rem 1rem;
     margin-top:1rem;
     border:none;
@@ -106,6 +106,13 @@
     object-fit: cover;
     border:2px solid gold;
 }
+#avatar-barra {
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    border:1px solid gold;
+    object-fit:cover;
+}
 </style>
 </head>
 <body>
@@ -118,7 +125,8 @@
 </div>
 
 <!-- Barra superior -->
-<div id="barra-superior">
+<div id="barra-superior" style="display:flex; align-items:center; gap:10px;">
+  <img id="avatar-barra" src="https://i.ibb.co/781Qj0J/logo.png" alt="Avatar">
   <span id="usuarioActivo"></span>
   <span id="contador">0 / 5 Colección</span>
   <div style="position: relative; display: inline-block;">
@@ -140,8 +148,8 @@
   </div>
   <button id="btnReiniciar">&#127873; Canjear Premio</button>
   <button id="btnLogout">Cerrar Sesión</button>
-  <a href="ranking.html" style="margin-left:10px;color:yellow">🏆 Ranking</a>
-  <button id="btnPanel" style="margin-left:10px;color:orange;background:none;border:none;cursor:pointer;">⚙️ Panel Cofundador</button>
+  <a href="ranking.html" style="color:yellow;">🏆 Ranking</a>
+  <button id="btnPerfil" style="color:orange;background:none;border:none;cursor:pointer;">⚙️ Perfil</button>
 </div>
 
 <!-- Álbum -->
@@ -166,15 +174,15 @@
   <button id="overlay-msg-close">Cerrar</button>
 </div>
 
-<!-- Panel de usuario -->
-<div id="panel-usuario">
-  <h2>Mi Panel</h2>
+<!-- Panel de usuario (Perfil) -->
+<div id="panel-perfil">
+  <h2>Mi Perfil</h2>
   <img id="avatar-preview" src="https://i.ibb.co/781Qj0J/logo.png" alt="Avatar">
   <input type="text" id="nuevoNombre" placeholder="Nuevo nombre">
   <input type="password" id="nuevaClave" placeholder="Nueva clave">
   <input type="file" id="nuevoAvatar" accept="image/*">
   <button id="btnGuardarCambios">Guardar Cambios</button>
-  <button id="btnCerrarPanel">Cerrar Panel</button>
+  <button id="btnCerrarPerfil">Cerrar</button>
 </div>
 
 <!-- Librerías externas -->
@@ -187,36 +195,43 @@
 <script src="script.js"></script>
 
 <script>
-// ===== Panel de usuario =====
-const btnPanel = document.getElementById('btnPanel');
-const panelUsuario = document.getElementById('panel-usuario');
-const btnCerrarPanel = document.getElementById('btnCerrarPanel');
+// ===== Perfil =====
+const btnPerfil = document.getElementById('btnPerfil');
+const panelPerfil = document.getElementById('panel-perfil');
+const btnCerrarPerfil = document.getElementById('btnCerrarPerfil');
 const btnGuardarCambios = document.getElementById('btnGuardarCambios');
 const avatarPreview = document.getElementById('avatar-preview');
 const inputAvatar = document.getElementById('nuevoAvatar');
 const inputNombre = document.getElementById('nuevoNombre');
 const inputClave = document.getElementById('nuevaClave');
 const usuarioActivo = document.getElementById('usuarioActivo');
+const avatarBarra = document.getElementById('avatar-barra');
 
+// Cargar usuario desde localStorage o crear por defecto
 let usuario = JSON.parse(localStorage.getItem('usuario')) || {nombre:'Cofundador', clave:'1234', avatar:'https://i.ibb.co/781Qj0J/logo.png'};
 
-// Mostrar usuario activo
+// Mostrar usuario activo y avatar en barra
 function mostrarUsuario(){
     usuarioActivo.textContent = usuario.nombre;
     avatarPreview.src = usuario.avatar;
+    avatarBarra.src = usuario.avatar;
 }
 mostrarUsuario();
 
-btnPanel.addEventListener('click', () => {
-    panelUsuario.style.display = 'block';
+// Abrir panel
+btnPerfil.addEventListener('click', () => {
+    panelPerfil.style.display = 'block';
     inputNombre.value = usuario.nombre;
     inputClave.value = usuario.clave;
+    avatarPreview.src = usuario.avatar;
 });
 
-btnCerrarPanel.addEventListener('click', () => {
-    panelUsuario.style.display = 'none';
+// Cerrar panel
+btnCerrarPerfil.addEventListener('click', () => {
+    panelPerfil.style.display = 'none';
 });
 
+// Previsualizar avatar al seleccionar
 inputAvatar.addEventListener('change', (e)=>{
     const file = e.target.files[0];
     if(file){
@@ -226,17 +241,18 @@ inputAvatar.addEventListener('change', (e)=>{
     }
 });
 
+// Guardar cambios
 btnGuardarCambios.addEventListener('click', ()=>{
     usuario.nombre = inputNombre.value || usuario.nombre;
     usuario.clave = inputClave.value || usuario.clave;
     usuario.avatar = avatarPreview.src;
     localStorage.setItem('usuario', JSON.stringify(usuario));
     mostrarUsuario();
-    panelUsuario.style.display = 'none';
-    alert('Cambios guardados con éxito!');
+    panelPerfil.style.display = 'none';
+    alert('Perfil actualizado correctamente!');
 });
 
-// ===== Logout =====
+// Logout
 document.getElementById('btnLogout').addEventListener('click', ()=>{
     localStorage.removeItem('usuario');
     alert('Sesión cerrada');
