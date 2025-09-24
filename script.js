@@ -254,3 +254,48 @@ function iniciarFuegosArtificiales() {
   setInterval(lanzarFuego, 1000);
   draw();
 }
+// ===== Botón Perfiles Públicos =====
+const perfilesPublicosContainer = document.getElementById('perfilesPublicos');
+const listaPublicos = document.getElementById('listaPublicos');
+
+// Abrir/Cerrar lista de perfiles públicos al hacer click en el título
+const tituloPublicos = perfilesPublicosContainer.querySelector('h4');
+tituloPublicos.style.cursor = 'pointer';
+tituloPublicos.addEventListener('click', () => {
+    if(listaPublicos.style.display === 'block'){
+        listaPublicos.style.display = 'none';
+    } else {
+        listaPublicos.style.display = 'block';
+        actualizarPerfilesPublicos();
+    }
+});
+
+// Función para actualizar la lista de perfiles públicos
+function actualizarPerfilesPublicos(){
+    listaPublicos.innerHTML = '';
+    for(let i=0;i<localStorage.length;i++){
+        const key = localStorage.key(i);
+        if(key.startsWith('user_')){
+            const u = JSON.parse(localStorage.getItem(key));
+            if(u.publico){
+                const div = document.createElement('div');
+                div.style.display='flex';
+                div.style.alignItems='center';
+                div.style.gap='5px';
+                div.innerHTML = `<img src="${u.avatar}"><span>${u.nombre}</span>`;
+                div.title = u.bio || '';
+                
+                // Click en perfil público abre modal o alerta con info
+                div.addEventListener('click', () => {
+                    alert(`Nombre: ${u.nombre}\nBio: ${u.bio || 'Sin bio'}\nPuntos: ${u.puntos || 0}`);
+                });
+
+                listaPublicos.appendChild(div);
+            }
+        }
+    }
+}
+
+// Inicializamos mostrando los perfiles públicos
+actualizarPerfilesPublicos();
+

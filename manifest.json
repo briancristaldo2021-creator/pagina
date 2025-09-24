@@ -1,0 +1,22 @@
+{
+  "name": "LCDM Colección",
+  "short_name": "LCDM",
+  "description": "Colecciona figuritas, escanea QR y competí en el ranking LCDM.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#00ffff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "img/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "img/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
