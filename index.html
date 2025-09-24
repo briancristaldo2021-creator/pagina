@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
+
+
 <head>
 	<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00ffff">
@@ -110,14 +112,6 @@
     <button id="btnEntrarCofundador">Acceso Cofundador 🔒</button>
   </div>
 </div>
-
-<script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js")
-    .then(() => console.log("Service Worker registrado ✅"))
-    .catch(err => console.error("Error SW:", err));
-}
-</script>
 
 <script>
 // ==============================
