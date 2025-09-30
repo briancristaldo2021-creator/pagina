@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Mostrar avatar y nombre
   const key = "user_" + usuarioActivo;
   const datos = JSON.parse(localStorage.getItem(key)) || {};
+  datos.usuario = usuarioActivo; // <-- aseguramos que siempre tenga la propiedad usuario
   datos.figuritas = datos.figuritas || [];
   localStorage.setItem(key, JSON.stringify(datos));
 
@@ -29,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
       div.querySelector("img").src = fig.imgColor;
     }
 
-    // click abre opciones: ver perfil de dueÒo (si otro), ofrecer/intercambiar si es mio
+    // click abre opciones: ver perfil de due√±o (si otro), ofrecer/intercambiar si es mio
     div.addEventListener('click', ()=>{
       // si es mio, abrir modal de opciones
       if(datos.figuritas.includes(fig.id)){
@@ -42,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if(!datosR){ alert('Usuario receptor no existe'); return; }
             // transferencia inmediata (demo)
             datos.figuritas = datos.figuritas.filter(f=>f!==fig.id);
+            datosR.usuario = receptor; // <-- aseguramos que tambi√©n tenga usuario
             datosR.figuritas = datosR.figuritas || [];
             datosR.figuritas.push(fig.id);
             localStorage.setItem(key, JSON.stringify(datos));
@@ -57,11 +59,14 @@ document.addEventListener("DOMContentLoaded", () => {
           const k = localStorage.key(i);
           if(k.startsWith('user_')){
             const d = JSON.parse(localStorage.getItem(k));
-            if((d.figuritas||[]).includes(fig.id)){ owner = d.usuario; break; }
+            if((d.figuritas||[]).includes(fig.id)){ 
+              owner = d.usuario || k.replace('user_', ''); // <-- fallback si falta usuario
+              break; 
+            }
           }
         }
         if(owner) window.location.href = 'perfil.html?user=' + encodeURIComponent(owner);
-        else alert('Nadie la tiene todavÌa');
+        else alert('Nadie la tiene todav√≠a');
       }
     });
 
@@ -75,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (datos.figuritas.length === figuritasData.length) {
       mostrarCelebracionConPremio();
     } else {
-      mostrarOverlayMensaje("A˙n no completaste el ·lbum. °Sigue coleccionando figuritas!");
+      mostrarOverlayMensaje("A√∫n no completaste el √°lbum. ¬°Sigue coleccionando figuritas!");
     }
   });
 
@@ -102,11 +107,11 @@ document.addEventListener("DOMContentLoaded", () => {
   tiendaBtn.textContent = 'Comprar sobre (30 coins)';
   tiendaBtn.style.marginLeft = '10px';
   tiendaBtn.onclick = ()=>{
-    if((datos.coins||0) < 30){ alert('No tenÈs coins suficientes'); return; }
+    if((datos.coins||0) < 30){ alert('No ten√©s coins suficientes'); return; }
     datos.coins = (datos.coins||0) - 30;
     // entregar figurita aleatoria que no tenga
     const faltantes = figuritasData.map(f=>f.id).filter(id=> !datos.figuritas.includes(id));
-    if(faltantes.length === 0){ alert('Ya tenÈs todo'); return; }
+    if(faltantes.length === 0){ alert('Ya ten√©s todo'); return; }
     const ele = faltantes[Math.floor(Math.random()*faltantes.length)];
     datos.figuritas.push(ele);
     localStorage.setItem(key, JSON.stringify(datos));
@@ -133,17 +138,17 @@ document.getElementById("overlay-msg-close").addEventListener("click", () => {
   document.getElementById("overlay-msg").style.display = "none";
 });
 
-// === CelebraciÛn con premio con m˙sica de YouTube ===
+// === Celebraci√≥n con premio con m√∫sica de YouTube ===
 function mostrarCelebracionConPremio() {
   const overlay = document.getElementById("completado-overlay");
   overlay.innerHTML = `
-    <h1>?? °Felicidades ${localStorage.getItem("usuarioActivo")}! ??</h1>
-    <p>°Completaste tu ¡lbum!</p>
+    <h1>?? ¬°Felicidades ${localStorage.getItem("usuarioActivo")}! ??</h1>
+    <p>¬°Completaste tu √Ålbum!</p>
     <p style="font-size:1.2rem;color:yellow;">Tu premio: <b>CODIGO1234</b></p>
     <canvas id="confeti"></canvas>
     <canvas id="fuegos"></canvas>
 
-    <!-- Video de YouTube invisible para m˙sica -->
+    <!-- Video de YouTube invisible para m√∫sica -->
     <iframe 
       id="musicaYT"
       width="0" 
@@ -160,7 +165,7 @@ function mostrarCelebracionConPremio() {
   iniciarConfeti();
   iniciarFuegosArtificiales();
 
-  // Ocultar despuÈs de 20s
+  // Ocultar despu√©s de 20s
   setTimeout(() => {
     overlay.classList.remove("visible");
     overlay.innerHTML = '';
@@ -254,11 +259,11 @@ function iniciarFuegosArtificiales() {
   setInterval(lanzarFuego, 1000);
   draw();
 }
-// ===== BotÛn Perfiles P˙blicos =====
+// ===== Bot√≥n Perfiles P√∫blicos =====
 const perfilesPublicosContainer = document.getElementById('perfilesPublicos');
 const listaPublicos = document.getElementById('listaPublicos');
 
-// Abrir/Cerrar lista de perfiles p˙blicos al hacer click en el tÌtulo
+// Abrir/Cerrar lista de perfiles p√∫blicos al hacer click en el t√≠tulo
 const tituloPublicos = perfilesPublicosContainer.querySelector('h4');
 tituloPublicos.style.cursor = 'pointer';
 tituloPublicos.addEventListener('click', () => {
@@ -270,7 +275,7 @@ tituloPublicos.addEventListener('click', () => {
     }
 });
 
-// FunciÛn para actualizar la lista de perfiles p˙blicos
+// Funci√≥n para actualizar la lista de perfiles p√∫blicos
 function actualizarPerfilesPublicos(){
     listaPublicos.innerHTML = '';
     for(let i=0;i<localStorage.length;i++){
@@ -285,7 +290,7 @@ function actualizarPerfilesPublicos(){
                 div.innerHTML = `<img src="${u.avatar}"><span>${u.nombre}</span>`;
                 div.title = u.bio || '';
                 
-                // Click en perfil p˙blico abre modal o alerta con info
+                // Click en perfil p√∫blico abre modal o alerta con info
                 div.addEventListener('click', () => {
                     alert(`Nombre: ${u.nombre}\nBio: ${u.bio || 'Sin bio'}\nPuntos: ${u.puntos || 0}`);
                 });
@@ -296,6 +301,6 @@ function actualizarPerfilesPublicos(){
     }
 }
 
-// Inicializamos mostrando los perfiles p˙blicos
+// Inicializamos mostrando los perfiles p√∫blicos
 actualizarPerfilesPublicos();
 
