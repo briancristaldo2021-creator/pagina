@@ -267,6 +267,8 @@ button:hover {
     #barra-superior { flex-direction: column; gap: 10px; }
     #tooltipAyuda { width: 220px; }
 }
+
+
 </style>
 </head>
 <body>

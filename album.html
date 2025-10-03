@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
-	<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00ffff">
 <head>
 <meta charset="UTF-8">
@@ -53,6 +53,11 @@
   <span id="usuarioActivo"></span>
   <span id="contador">0 / 5 Colección</span>
   <div style="position: relative; display: inline-block;">
+    <button id="btnMio" 
+        style="color:#00ffff; background:linear-gradient(45deg, #ff0, #f0f); border:none; border-radius:10px; padding:5px 10px; cursor:pointer; font-weight:bold;"
+        onclick="location.href='muro.html'">
+  ✨ Global ✨
+</button>
     <button id="btnAyuda">Ayuda</button>
     <div id="tooltipAyuda">
       <div class="tooltipFlecha"></div>
@@ -121,182 +126,19 @@
   </div>
 </div>
 
-<!-- Lista perfiles públicos -->
-<div id="perfilesPublicos">
-  <h4 id="togglePublicos" style="cursor:pointer;">Perfiles Públicos ▼</h4>
-  <div id="listaPublicos" style="display:none; max-height:200px; overflow-y:auto;"></div>
-</div>
-
-
 <!-- Librerías externas -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script src="codigos.js"></script>
 <script src="qr.js"></script>
 <script src="script.js"></script>
+
 <script>
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js")
     .then(() => console.log("Service Worker registrado ✅"))
     .catch(err => console.error("Error SW:", err));
 }
-</script>
-
-<script>
-// ===== Perfil =====
-const btnPerfil = document.getElementById('btnPerfil');
-const panelPerfil = document.getElementById('panel-perfil');
-const btnCerrarPerfil = document.getElementById('btnCerrarPerfil');
-const btnGuardarCambios = document.getElementById('btnGuardarCambios');
-const avatarPreview = document.getElementById('avatar-preview');
-const inputAvatar = document.getElementById('nuevoAvatar');
-const inputNombre = document.getElementById('nuevoNombre');
-const inputClave = document.getElementById('nuevaClave');
-const usuarioActivo = document.getElementById('usuarioActivo');
-const avatarBarra = document.getElementById('avatar-barra');
-const perfilPublicoCheck = document.getElementById('perfilPublicoCheck');
-const perfilBio = document.getElementById('perfilBio');
-
-// Usuario
-let usuario = JSON.parse(localStorage.getItem('usuario')) || {nombre:'Cofundador', clave:'1234', avatar:'https://i.ibb.co/781Qj0J/logo.png', puntos:0, publico:false, bio:''};
-
-// Ranking
-let ranking = JSON.parse(localStorage.getItem('ranking')) || [];
-function guardarRanking() {
-    let index = ranking.findIndex(u=>u.nombre===usuario.nombre);
-    if(index>=0){ ranking[index]=usuario; } else { ranking.push(usuario); }
-    localStorage.setItem('ranking', JSON.stringify(ranking));
-}
-
-// Mostrar usuario
-function mostrarUsuario(){
-    usuarioActivo.textContent = usuario.nombre;
-    avatarPreview.src = usuario.avatar;
-    avatarBarra.src = usuario.avatar;
-    guardarRanking();
-}
-mostrarUsuario();
-
-// Abrir perfil
-btnPerfil.addEventListener('click',()=>{
-    panelPerfil.style.display='block';
-    inputNombre.value=usuario.nombre;
-    inputClave.value=usuario.clave;
-    avatarPreview.src=usuario.avatar;
-    perfilPublicoCheck.checked = usuario.publico;
-    perfilBio.value = usuario.bio || '';
-});
-
-// Cerrar perfil
-btnCerrarPerfil.addEventListener('click',()=>panelPerfil.style.display='none');
-
-// Previsualizar avatar
-inputAvatar.addEventListener('change',(e)=>{
-    const file=e.target.files[0];
-    if(file){
-        const reader=new FileReader();
-        reader.onload=()=>avatarPreview.src=reader.result;
-        reader.readAsDataURL(file);
-    }
-});
-
-// Guardar cambios
-btnGuardarCambios.addEventListener('click',()=>{
-    usuario.nombre=inputNombre.value||usuario.nombre;
-    usuario.clave=inputClave.value||usuario.clave;
-    usuario.avatar=avatarPreview.src;
-    usuario.publico = perfilPublicoCheck.checked;
-    usuario.bio = perfilBio.value;
-    localStorage.setItem('usuario',JSON.stringify(usuario));
-    mostrarUsuario();
-    panelPerfil.style.display='none';
-    alert('Perfil actualizado correctamente!');
-    actualizarPerfilesPublicos();
-});
-
-// Logout
-document.getElementById('btnLogout').addEventListener('click',()=>{
-    localStorage.removeItem('usuario');
-    alert('Sesión cerrada');
-    location.reload();
-});
-
-// Sumar puntos
-function sumarPuntos(puntos=10){
-    usuario.puntos=(usuario.puntos||0)+puntos;
-    localStorage.setItem('usuario',JSON.stringify(usuario));
-    mostrarUsuario();
-}
-
-// ===== Botón misterioso sobre logo =====
-const btnCofundador = document.getElementById('btnCofundador');
-document.getElementById('logo').addEventListener('mouseenter',()=>{
-  if(usuario && (usuario.nombre==='admin'||usuario.nombre==='cofundador')){
-    btnCofundador.style.display='inline-block';
-  }
-});
-
-// ===== Panel Cofundador =====
-const panelCofundador = document.getElementById('panel-cofundador');
-const btnAdminLogin = document.getElementById('btnAdminLogin');
-const btnCerrarAdmin = document.getElementById('btnCerrarAdmin');
-const adminAcciones = document.getElementById('adminAcciones');
-
-btnCofundador.addEventListener('click',()=>panelCofundador.style.display='block');
-btnCerrarAdmin.addEventListener('click',()=>panelCofundador.style.display='none');
-
-btnAdminLogin.addEventListener('click',()=>{
-  const pass = document.getElementById('adminPass').value;
-  if(pass==='admin123'){ // Cambiás aquí tu contraseña real
-    adminAcciones.style.display='block';
-    alert('Bienvenido Cofundador!');
-  }else{
-    alert('Contraseña incorrecta');
-  }
-});
-
-// Acciones admin
-document.getElementById('btnResetAll').addEventListener('click', ()=>{
-  if(confirm('Borrar todos los users?')){
-    const keys = [];
-    for(let i=0;i<localStorage.length;i++){
-      const k = localStorage.key(i);
-      if(k && k.startsWith('user_')) keys.push(k);
-    }
-    keys.forEach(k=> localStorage.removeItem(k));
-    alert('Usuarios eliminados'); location.reload();
-  }
-});
-
-document.getElementById('btnExport').addEventListener('click', ()=>{
-  const dump = {};
-  for(let i=0;i<localStorage.length;i++){
-    const k = localStorage.key(i);
-    if(k.startsWith('user_')) dump[k]=JSON.parse(localStorage.getItem(k));
-  }
-  console.log('Usuarios export:', dump);
-  alert('Revisá la consola (F12)');
-});
-
-// Mostrar perfiles públicos
-function actualizarPerfilesPublicos(){
-  const lista = document.getElementById('listaPublicos');
-  lista.innerHTML='';
-  for(let i=0;i<localStorage.length;i++){
-    const key = localStorage.key(i);
-    if(key.startsWith('user_')){
-      const u = JSON.parse(localStorage.getItem(key));
-      if(u.publico){
-        const div = document.createElement('div');
-        div.style.display='flex'; div.style.alignItems='center'; div.style.gap='5px';
-        div.innerHTML = `<img src="${u.avatar}"><span>${u.nombre}</span>`;
-        div.title = u.bio || '';
-        lista.appendChild(div);
-      }
-    }
-  }
-}
-actualizarPerfilesPublicos();
 </script>
 
 </body>

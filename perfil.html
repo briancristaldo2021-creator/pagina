@@ -1,6 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perfil Usuario Mejorado - LCDM COLECCIÓN</title>
+<style>
+/* ----- Paneles ----- */
+#panel-perfil { display:none; position: fixed; top:50%; left:50%; transform: translate(-50%,-50%); background:#111; color:#fff; padding:2rem; border-radius:15px; z-index:10000; width:300px; text-align:center; }
+#panel-perfil input, #panel-perfil textarea { width: 90%; padding:0.5rem; margin:0.5rem 0; border-radius:5px; border:none; font-size:1rem; }
+#panel-perfil button { padding:0.5rem 1rem; margin-top:1rem; border:none; border-radius:5px; background: gold; color:black; font-weight:bold; cursor:pointer; }
+#avatar-preview { width:80px; height:80px; border-radius:50%; margin-bottom:10px; object-fit: cover; border:2px solid gold; }
+#avatar-barra { width:30px; height:30px; border-radius:50%; border:1px solid gold; object-fit:cover; }
+
+/* ----- Barra superior ----- */
+#barra-superior { display:flex; align-items:center; gap:10px; margin-bottom:1rem; background:#222; padding:10px; border-radius:10px; color:white; }
+#barra-superior button { border:none; border-radius:5px; padding:5px 10px; cursor:pointer; font-weight:bold; }
+
+/* ----- Contenedores ----- */
+#figuritasContainer span { margin:0 5px; cursor:pointer; padding:5px 10px; background:#333; border-radius:5px; display:inline-block; }
+.post { border:1px solid #444; padding:10px; margin:5px 0; border-radius:10px; background:#222; color:white; }
+.post img { max-width:100px; display:block; margin:5px 0; }
+#toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#333; color:white; padding:10px 20px; border-radius:10px; display:none; z-index:9999; }
+
+/* ----- Historial y Ranking ----- */
+#historialContainer, #rankingContainer { margin-top:1rem; padding:1rem; border:1px solid #444; border-radius:10px; background:#222; color:white; max-height:200px; overflow-y:auto; }
+</style>
+</head>
+<body>
+
+<!-- Barra superior -->
+<div id="barra-superior">
+  <img id="avatar-barra" src="" alt="Avatar">
+  <span id="usuarioActivo"></span>
+  <span id="puntosUsuario">Puntos: 0</span>
+  <button id="btnPerfil">⚙️ Perfil</button>
+  <button id="btnLogout">Cerrar Sesión</button>
+</div>
+
+<!-- Crear nuevo post -->
+<h2>Crear Post</h2>
+<textarea id="nuevoPostTexto" placeholder="Escribe tu post..." style="width:90%; height:60px;"></textarea><br>
+<button id="btnAgregarPost">Agregar Post</button>
+
+<!-- Contenedor figuritas -->
+<h2>Mis Figuritas</h2>
+<div id="figuritasContainer"></div>
+
+<!-- Contenedor posts -->
+<h2>Mis Posts</h2>
+<div id="postsUsuario"></div>
+
+<!-- Contenedor historial -->
+<h2>Historial</h2>
+<div id="historialContainer"></div>
+
+<!-- Contenedor ranking -->
+<h2>Ranking</h2>
+<div id="rankingContainer"></div>
+
+<!-- Panel de usuario -->
+<div id="panel-perfil">
+  <h2>Mi Perfil</h2>
+  <img id="avatar-preview" src="" alt="Avatar">
+  <input type="text" id="nuevoNombre" placeholder="Nuevo nombre">
+  <input type="password" id="nuevaClave" placeholder="Nueva clave">
+  <textarea id="perfilBio" placeholder="Escribe tu bio"></textarea>
+  <label><input type="checkbox" id="perfilPublicoCheck"> Hacer perfil público</label>
+  <input type="file" id="nuevoAvatar" accept="image/*">
+  <button id="btnGuardarCambios">Guardar Cambios</button>
+  <button id="btnCerrarPerfil">Cerrar</button>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
 <script>
 document.addEventListener("DOMContentLoaded", ()=>{
 
+// ===== Elementos DOM =====
 const btnPerfil = document.getElementById('btnPerfil');
 const panelPerfil = document.getElementById('panel-perfil');
 const btnCerrarPerfil = document.getElementById('btnCerrarPerfil');
@@ -10,62 +87,206 @@ const inputAvatar = document.getElementById('nuevoAvatar');
 const inputNombre = document.getElementById('nuevoNombre');
 const inputClave = document.getElementById('nuevaClave');
 const usuarioActivo = document.getElementById('usuarioActivo');
+const avatarBarra = document.getElementById('avatar-barra');
+const perfilPublicoCheck = document.getElementById('perfilPublicoCheck');
+const perfilBio = document.getElementById('perfilBio');
 const btnLogout = document.getElementById('btnLogout');
+const puntosUsuario = document.getElementById('puntosUsuario');
+const figuritasContainer = document.getElementById('figuritasContainer');
+const postsUsuario = document.getElementById('postsUsuario');
+const historialContainer = document.getElementById('historialContainer');
+const rankingContainer = document.getElementById('rankingContainer');
+const toast = document.getElementById('toast');
+const btnAgregarPost = document.getElementById('btnAgregarPost');
+const nuevoPostTexto = document.getElementById('nuevoPostTexto');
 
-// Cargar usuario desde localStorage o crear por defecto
+// ===== Usuario =====
 let usuario = JSON.parse(localStorage.getItem('usuario')) || {
-    nombre:'Cofundador',
-    clave:'1234',
-    avatar:'https://i.ibb.co/781Qj0J/logo.png'
+  nombre:'Cofundador',
+  clave:'1234',
+  avatar:'https://i.ibb.co/781Qj0J/logo.png',
+  puntos: 0,
+  figuritas: [],
+  publico:false,
+  bio:''
 };
 
-// Función para mostrar usuario en la barra
+// ===== Ranking =====
+let ranking = JSON.parse(localStorage.getItem('ranking')) || [];
+
+// ===== Historial =====
+let historial = JSON.parse(localStorage.getItem('historial')) || [];
+
+// ===== Funciones =====
+
+// Mostrar usuario
 function mostrarUsuario(){
-    usuarioActivo.textContent = usuario.nombre;
-    avatarPreview.src = usuario.avatar;
+  usuarioActivo.textContent = usuario.nombre;
+  avatarPreview.src = usuario.avatar;
+  avatarBarra.src = usuario.avatar;
+  puntosUsuario.textContent = `Puntos: ${usuario.puntos || 0}`;
+  renderFiguritas();
+  renderPosts();
+  renderHistorial();
+  renderRanking();
+  guardarUsuario();
 }
-mostrarUsuario();
 
-// Abrir panel
-btnPerfil.addEventListener('click', () => {
-    panelPerfil.style.display = 'block';
-    inputNombre.value = usuario.nombre;
-    inputClave.value = usuario.clave;
-    avatarPreview.src = usuario.avatar;
-});
+// Guardar usuario
+function guardarUsuario(){
+  localStorage.setItem('usuario', JSON.stringify(usuario));
+  actualizarRanking();
+}
 
-// Cerrar panel
-btnCerrarPerfil.addEventListener('click', () => {
-    panelPerfil.style.display = 'none';
-});
+// ----- Figuritas -----
+function renderFiguritas(){
+  figuritasContainer.innerHTML='';
+  if(usuario.figuritas.length===0){ figuritasContainer.textContent='No tienes figuritas'; return; }
+  usuario.figuritas.forEach(f=>{
+    const span = document.createElement('span');
+    span.textContent=f;
+    span.onclick = ()=>{
+      mostrarToast(`Figurita: ${f}`);
+      sumarPuntos(5);
+      agregarHistorial(`Vio la figurita ${f}`);
+    };
+    figuritasContainer.appendChild(span);
+  });
+}
 
-// Previsualizar avatar al seleccionar
-inputAvatar.addEventListener('change', (e)=>{
-    const file = e.target.files[0];
-    if(file){
-        const reader = new FileReader();
-        reader.onload = ()=> avatarPreview.src = reader.result;
-        reader.readAsDataURL(file);
+// ----- Posts -----
+function renderPosts(){
+  postsUsuario.innerHTML='';
+  for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    if(key.startsWith('post_')){
+      const post = JSON.parse(localStorage.getItem(key));
+      if(post.usuario===usuario.nombre){
+        const div = document.createElement('div');
+        div.className='post';
+        div.innerHTML = `
+          <p>${post.texto}</p>
+          <div>❤️ ${post.likes || 0} | 💬 ${post.comentarios?.length || 0}
+            <button onclick="eliminarPost('${key}')">Eliminar</button>
+          </div>
+        `;
+        postsUsuario.appendChild(div);
+      }
     }
+  }
+}
+
+// ----- Agregar Post -----
+btnAgregarPost.addEventListener('click', ()=>{
+  const texto = nuevoPostTexto.value.trim();
+  if(texto===''){ mostrarToast('Escribe algo para tu post'); return; }
+  const key = 'post_' + Date.now();
+  const post = { usuario: usuario.nombre, texto, likes:0, comentarios:[] };
+  localStorage.setItem(key, JSON.stringify(post));
+  nuevoPostTexto.value='';
+  renderPosts();
+  sumarPuntos(10);
+  agregarHistorial('Creó un post');
+  mostrarToast('Post agregado!');
 });
 
-// Guardar cambios
+// ----- Eliminar post -----
+window.eliminarPost = function(key){
+  localStorage.removeItem(key);
+  renderPosts();
+  sumarPuntos(-5);
+  agregarHistorial('Eliminó un post');
+  mostrarToast('Post eliminado');
+}
+
+// ----- Historial -----
+function agregarHistorial(accion){
+  const registro = { fecha: new Date().toLocaleString(), accion };
+  historial.unshift(registro);
+  localStorage.setItem('historial', JSON.stringify(historial));
+  renderHistorial();
+}
+function renderHistorial(){
+  historialContainer.innerHTML='';
+  if(historial.length===0){ historialContainer.textContent='No hay historial'; return; }
+  historial.forEach(h=>{
+    const div = document.createElement('div');
+    div.textContent=`[${h.fecha}] ${h.accion}`;
+    historialContainer.appendChild(div);
+  });
+}
+
+// ----- Ranking -----
+function actualizarRanking(){
+  const index = ranking.findIndex(u=>u.nombre===usuario.nombre);
+  if(index>=0){ ranking[index]=usuario; } else { ranking.push(usuario); }
+  localStorage.setItem('ranking', JSON.stringify(ranking));
+  renderRanking();
+}
+function renderRanking(){
+  rankingContainer.innerHTML='';
+  if(ranking.length===0){ rankingContainer.textContent='Sin ranking'; return; }
+  const sorted = [...ranking].sort((a,b)=>b.puntos - a.puntos);
+  sorted.forEach(u=>{
+    const div = document.createElement('div');
+    div.textContent=`${u.nombre} - Puntos: ${u.puntos || 0}`;
+    rankingContainer.appendChild(div);
+  });
+}
+
+// ----- Perfil -----
+btnPerfil.addEventListener('click', ()=>{
+  panelPerfil.style.display='block';
+  inputNombre.value = usuario.nombre;
+  inputClave.value = usuario.clave;
+  avatarPreview.src = usuario.avatar;
+  perfilPublicoCheck.checked = usuario.publico;
+  perfilBio.value = usuario.bio || '';
+});
+btnCerrarPerfil.addEventListener('click', ()=> panelPerfil.style.display='none');
+inputAvatar.addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload=()=> avatarPreview.src = reader.result;
+    reader.readAsDataURL(file);
+  }
+});
 btnGuardarCambios.addEventListener('click', ()=>{
-    usuario.nombre = inputNombre.value || usuario.nombre;
-    usuario.clave = inputClave.value || usuario.clave;
-    usuario.avatar = avatarPreview.src;
-    localStorage.setItem('usuario', JSON.stringify(usuario));
-    mostrarUsuario();
-    panelPerfil.style.display = 'none';
-    alert('Perfil actualizado correctamente!');
+  usuario.nombre = inputNombre.value || usuario.nombre;
+  usuario.clave = inputClave.value || usuario.clave;
+  usuario.avatar = avatarPreview.src;
+  usuario.publico = perfilPublicoCheck.checked;
+  usuario.bio = perfilBio.value;
+  mostrarUsuario();
+  panelPerfil.style.display='none';
+  agregarHistorial('Actualizó perfil');
+  mostrarToast('Perfil actualizado');
 });
 
-// Logout
+// ----- Logout -----
 btnLogout.addEventListener('click', ()=>{
-    localStorage.removeItem('usuario');
-    alert('Sesión cerrada');
-    location.reload();
+  localStorage.removeItem('usuario');
+  location.reload();
 });
+
+// ----- Puntos -----
+function sumarPuntos(puntos=10){
+  usuario.puntos = (usuario.puntos||0) + puntos;
+  mostrarUsuario();
+}
+
+// ----- Toast -----
+function mostrarToast(msg){
+  toast.textContent = msg;
+  toast.style.display='block';
+  setTimeout(()=>{ toast.style.display='none'; }, 2000);
+}
+
+// Inicializar
+mostrarUsuario();
 
 });
 </script>
+</body>
+</html>

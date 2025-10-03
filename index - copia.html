@@ -3,151 +3,128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bienvenido a la coleccion LCDM</title>
+<title>Mi Muro ✨</title>
+<link rel="stylesheet" href="style.css">
+
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
+body { margin:0; font-family:sans-serif; background:#111; color:#fff; }
+#barra-superior { display:flex; align-items:center; gap:10px; padding:10px; background:#222; }
+#barra-superior img { width:30px; height:30px; border-radius:50%; border:1px solid gold; object-fit:cover; }
+#barra-superior span { font-weight:bold; color:gold; }
+#btnVolver { background:none; border:none; color:#0ff; cursor:pointer; font-weight:bold; }
 
-  body { 
-    font-family:'Arial', sans-serif; 
-    background:#0d0d0d; 
-    color:#00ffff; 
-    display:flex; 
-    justify-content:center; 
-    align-items:center; 
-    min-height:100vh; 
-    flex-direction:column; 
-  }
+#muro-container { padding:20px; max-width:800px; margin:0 auto; }
+#publicar { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+#publicar textarea { width:100%; padding:10px; border-radius:10px; border:none; resize:none; }
+#publicar input[type="file"] { color:#fff; }
+#publicar button { background:linear-gradient(45deg,#ff0,#f0f); border:none; padding:10px; border-radius:10px; cursor:pointer; font-weight:bold; color:black; }
 
-  /* Logo arriba */
-  #logo-container {
-    position: absolute;
-    top: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-  }
-  #logo {
-    max-width: 150px;
-    height: auto;
-    cursor: pointer;
-    transition: transform 0.3s;
-  }
-  #logo:hover { transform: scale(1.1); }
+#feed { display:flex; flex-direction:column; gap:15px; }
 
-  /* Overlay de bienvenida */
-  #bienvenida { 
-    position:fixed; top:0; left:0; width:100%; height:100%;
-    background:#000; display:flex; flex-direction:column; justify-content:center; align-items:center;
-    font-size:2rem; text-align:center; z-index:1000; opacity:1; transition:opacity 1.5s ease;
-  }
-  #bienvenida button { 
-    margin-top:20px; padding:10px 20px; font-size:1rem; 
-    background:#00ffff; border:none; border-radius:8px; cursor:pointer; color:#0d0d0d; transition:all 0.3s; 
-  }
-  #bienvenida button:hover { background:#009999; }
+.post { background:#222; padding:10px; border-radius:10px; display:flex; gap:10px; align-items:flex-start; }
+.post img.avatar { width:40px; height:40px; border-radius:50%; border:1px solid gold; object-fit:cover; }
+.post-content { display:flex; flex-direction:column; gap:5px; }
+.post-content span { font-weight:bold; color:gold; }
+.post-content p { margin:0; }
 
-  /* Cuadro login/registro centrado */
-  #login-container {
-    display:none;
-    flex-direction:column;
-    align-items:center;
-    background:#111;
-    padding:40px;
-    border-radius:12px;
-    box-shadow:0 0 20px #00ffff;
-    margin-top:80px;
-    width:300px;
-    text-align:center;
-  }
-  #login-container h2 { margin-bottom:20px; }
-  #login-container input {
-    margin:10px 0; padding:10px; width:100%; border-radius:6px; border:none;
-  }
-  #login-container button {
-    margin-top:10px; padding:10px 20px; border-radius:6px; border:none;
-    background:#00ffff; color:#0d0d0d; font-weight:bold; cursor:pointer; transition:all 0.3s;
-  }
-  #login-container button:hover { background:#009999; color:white; }
-  #mensaje { margin-top:10px; font-weight:bold; }
+.confetti { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999; display:none; }
 </style>
 </head>
 <body>
 
-<!-- Logo arriba -->
-<div id="logo-container">
-    <img src="https://i.ibb.co/781Qj0J/logo.png" alt="Logo Los LCDM" id="logo">
+<!-- Barra superior -->
+<div id="barra-superior">
+  <button id="btnVolver">&#8592; Álbum</button>
+  <img id="avatar-barra" src="https://i.ibb.co/781Qj0J/logo.png" alt="Avatar">
+  <span id="usuarioActivo"></span>
 </div>
 
-<!-- Overlay de bienvenida -->
-<div id="bienvenida">
-  <h1>¡Bienvenido A la Coleccion LCDM!</h1>
-  <p>Registrate o inicia sesión para comenzar</p>
-  <button onclick="cerrarBienvenida()">Comenzar</button>
-</div>
-<!-- Login / Registro -->
-<div id="login-container">
-  <h2>Registro / Iniciar</h2>
-  <input type="text" id="usuario" placeholder="Usuario">
-  <input type="password" id="password" placeholder="Contraseña">
-  <button onclick="registrarOLogin()">Ingresar</button>
-  <p id="mensaje"></p>
-  <p>¿No tenés cuenta? <a href="registro.html">Registrate aquí</a></p>
+<!-- Contenedor muro -->
+<div id="muro-container">
+  <h1>✨ Mi Muro ✨</h1>
+
+  <!-- Sección publicar -->
+  <div id="publicar">
+    <textarea id="nuevoPost" placeholder="¿Qué querés compartir hoy?" rows="3"></textarea>
+    <input type="file" id="imagenPost" accept="image/*">
+    <button id="btnPublicar">Publicar</button>
+  </div>
+
+  <!-- Feed -->
+  <div id="feed"></div>
 </div>
 
+<canvas class="confetti" id="confetti"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 <script>
+// Usuario
+let usuario = JSON.parse(localStorage.getItem('usuario')) || {nombre:'Cofundador', avatar:'https://i.ibb.co/781Qj0J/logo.png'};
+document.getElementById('usuarioActivo').textContent = usuario.nombre;
+document.getElementById('avatar-barra').src = usuario.avatar;
 
-// ==============================
-// Overlay de bienvenida
-// ==============================
-function cerrarBienvenida() {
-  const overlay = document.getElementById('bienvenida');
-  overlay.style.opacity = 0;
-  setTimeout(() => {
-    overlay.style.display = 'none';
-    document.getElementById('login-container').style.display = 'flex';
-  }, 1000);
+// Volver al álbum
+document.getElementById('btnVolver').addEventListener('click', ()=>{ window.location.href='album.html'; });
+
+// Guardar post en localStorage
+const btnPublicar = document.getElementById('btnPublicar');
+const feed = document.getElementById('feed');
+
+function cargarFeed(){
+  feed.innerHTML='';
+  const posts = JSON.parse(localStorage.getItem('posts_'+usuario.nombre)) || [];
+  posts.sort((a,b)=> b.timestamp - a.timestamp); // mostrar últimos primero
+  posts.forEach(p=>{
+    const div = document.createElement('div');
+    div.className='post';
+    div.innerHTML = `
+      <img class="avatar" src="${usuario.avatar}">
+      <div class="post-content">
+        <span>${usuario.nombre}</span>
+        <p>${p.texto}</p>
+        ${p.imagen ? `<img src="${p.imagen}" style="max-width:200px;border-radius:10px;">` : ''}
+      </div>
+    `;
+    feed.appendChild(div);
+  });
+}
+cargarFeed();
+
+// Publicar
+btnPublicar.addEventListener('click', ()=>{
+  const texto = document.getElementById('nuevoPost').value.trim();
+  const archivo = document.getElementById('imagenPost').files[0];
+
+  if(!texto && !archivo){ alert('Escribí algo o subí una imagen'); return; }
+
+  if(archivo){
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      guardarPost(texto, reader.result);
+    };
+    reader.readAsDataURL(archivo);
+  }else{
+    guardarPost(texto,null);
+  }
+});
+
+function guardarPost(texto, imagen){
+  const posts = JSON.parse(localStorage.getItem('posts_'+usuario.nombre)) || [];
+  posts.push({texto, imagen, timestamp:Date.now()});
+  localStorage.setItem('posts_'+usuario.nombre, JSON.stringify(posts));
+  document.getElementById('nuevoPost').value='';
+  document.getElementById('imagenPost').value='';
+  cargarFeed();
+  lanzarConfetti();
 }
 
-// ==============================
-// Registro / Login
-// ==============================
-function registrarOLogin() {
-  const usuario = document.getElementById('usuario').value.trim();
-  const password = document.getElementById('password').value.trim();
-  const mensaje = document.getElementById('mensaje');
-
-  if(!usuario || !password){
-      mensaje.textContent = "Completa todos los campos";
-      mensaje.style.color = "red";
-      return;
-  }
-
-  const key = 'user_' + usuario;
-  const datosGuardados = localStorage.getItem(key);
-
-  if(datosGuardados){
-      const userObj = JSON.parse(datosGuardados);
-      if(userObj.password === password){
-          localStorage.setItem('usuarioActivo', usuario);
-          window.location.href = 'album.html';
-      } else {
-          mensaje.textContent = "Contraseña incorrecta";
-          mensaje.style.color = "red";
-      }
-  } else {
-      localStorage.setItem(key, JSON.stringify({usuario, password, figuritas: []}));
-      localStorage.setItem('usuarioActivo', usuario);
-      window.location.href = 'album.html';
-  }
+// Confetti
+function lanzarConfetti(){
+  const canvas = document.getElementById('confetti');
+  canvas.style.display='block';
+  confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+  setTimeout(()=>{ canvas.style.display='none'; },1000);
 }
-
-// Enter para enviar
-document.getElementById('password').addEventListener('keypress', e => {
-  if(e.key === 'Enter') registrarOLogin();
-});
-document.getElementById('usuario').addEventListener('keypress', e => {
-  if(e.key === 'Enter') registrarOLogin();
-});
 </script>
 
 </body>
