@@ -1,25 +1,127 @@
 <!DOCTYPE html>
 <html lang="es">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Panel Admin</title>
-<style>body{font-family:sans-serif;background:#111;color:#fff;padding:12px}.user{display:flex;align-items:center;gap:12px;padding:8px;background:#222;border-radius:8px;margin:6px}</style></head>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Admin LCDM</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body { background:#111; color:#fff; font-family:sans-serif; text-align:center; }
+.panel-container { max-width:1000px; margin:20px auto; padding:20px; background:#222; border-radius:12px; }
+.user-item { display:flex; align-items:center; justify-content:space-between; padding:6px 12px; background:#111; border-radius:6px; margin-bottom:4px; }
+.user-item img { width:30px; height:30px; border-radius:50%; margin-right:6px; object-fit:cover; border:1px solid gold; }
+.user-item button { padding:2px 6px; border:none; border-radius:4px; background:gold; color:black; cursor:pointer; margin-left:4px; }
+#loginAdmin { display:flex; flex-direction:column; align-items:center; gap:6px; margin-top:50px; }
+#loginAdmin input { padding:6px 8px; border-radius:6px; border:none; }
+</style>
+</head>
 <body>
-<h1>Panel (Listar usuarios)</h1>
-<div id="users"></div>
-<div style="margin-top:12px"><button onclick="location.href='album.html'">Volver</button></div>
-<script src="frontend-api.js"></script>
+
+<div class="panel-container" id="adminPanel" style="display:none;">
+  <a href="album.html">← Volver</a>
+  <h1>Panel Admin / Cofundador</h1>
+  <div id="stats"></div>
+  <h3>Usuarios registrados</h3>
+  <div id="usersList"></div>
+  <div style="margin-top:12px;">
+    <button id="btnResetAll">Resetear todos los usuarios</button>
+    <button id="btnExport">Exportar usuarios (consola)</button>
+  </div>
+</div>
+
+<!-- Login Admin -->
+<div id="loginAdmin">
+  <h2>Acceso Admin</h2>
+  <input type="text" id="loginUsuario" placeholder="Usuario">
+  <input type="password" id="loginClave" placeholder="Clave">
+  <button id="btnLogin">Ingresar</button>
+</div>
+
 <script>
-async function loadUsers(){
-  const res = await getJSON('get_users.php');
-  const el = document.getElementById('users'); el.innerHTML='';
-  if(res.success && res.users){
-    res.users.forEach(u=>{
-      const d = document.createElement('div'); d.className='user';
-      d.innerHTML = `<img src="${u.avatar}" style="width:48px;height:48px;border-radius:50%"><div><strong>${u.usuario}</strong><div style="color:#ccc">${u.bio||''}</div></div><div style="margin-left:auto">${u.puntos||0} pts</div>`;
-      el.appendChild(d);
-    });
-  } else el.innerHTML = '<p>No users</p>';
+// ===== Crear admin inicial =====
+let admin = JSON.parse(localStorage.getItem('usuario_admin')) || {nombre:'admin', clave:'admin123'};
+localStorage.setItem('usuario_admin', JSON.stringify(admin));
+
+// ===== Login =====
+const loginDiv = document.getElementById('loginAdmin');
+const panelDiv = document.getElementById('adminPanel');
+document.getElementById('btnLogin').addEventListener('click', ()=>{
+    const u = document.getElementById('loginUsuario').value;
+    const c = document.getElementById('loginClave').value;
+    const adminData = JSON.parse(localStorage.getItem('usuario_admin'));
+    if(u===adminData.nombre && c===adminData.clave){
+        loginDiv.style.display='none';
+        panelDiv.style.display='block';
+        localStorage.setItem('usuarioActivo','admin');
+        mostrarStats();
+    } else {
+        alert('Usuario o clave incorrecta');
+    }
+});
+
+// ===== Stats y listado =====
+function mostrarStats(){
+    let totalUsuarios=0; let totalFig=0; let totalCoins=0;
+    const list = document.getElementById('usersList'); list.innerHTML='';
+    for(let i=0;i<localStorage.length;i++){
+        const key = localStorage.key(i);
+        if(key.startsWith('user_')){
+            const datos = JSON.parse(localStorage.getItem(key));
+            totalUsuarios++; totalFig += (datos.figuritas||[]).length; totalCoins += (datos.coins||0);
+            const el = document.createElement('div');
+            el.className='user-item';
+            el.innerHTML = `
+                <div style="display:flex; align-items:center;">
+                    <img src="${datos.avatar}" alt="Avatar">
+                    <span>${datos.usuario}</span>
+                </div>
+                <div>
+                    <span>${(datos.figuritas||[]).length} fig</span>
+                    <span>${datos.coins||0} coins</span>
+                    <button onclick="editarUsuario('${key}')">Editar</button>
+                </div>
+            `;
+            list.appendChild(el);
+        }
+    }
+    document.getElementById('stats').innerHTML = `Usuarios: ${totalUsuarios} · Figuritas totales: ${totalFig} · Coins totales: ${totalCoins}`;
 }
-loadUsers();
+
+// ===== Resetear usuarios =====
+document.getElementById('btnResetAll').addEventListener('click', ()=>{
+    if(confirm('Borrar todos los usuarios?')){
+        const keys = [];
+        for(let i=0;i<localStorage.length;i++){
+            const k = localStorage.key(i);
+            if(k.startsWith('user_')) keys.push(k);
+        }
+        keys.forEach(k=> localStorage.removeItem(k));
+        alert('Usuarios eliminados'); mostrarStats();
+    }
+});
+
+// ===== Exportar usuarios =====
+document.getElementById('btnExport').addEventListener('click', ()=>{
+    const dump = {};
+    for(let i=0;i<localStorage.length;i++){
+        const k = localStorage.key(i);
+        if(k.startsWith('user_')) dump[k] = JSON.parse(localStorage.getItem(k));
+    }
+    console.log('Usuarios export:', dump);
+    alert('Revisá la consola (F12)');
+});
+
+// ===== Editar usuario =====
+function editarUsuario(key){
+    const datos = JSON.parse(localStorage.getItem(key));
+    const nuevoNombre = prompt("Nuevo nombre:", datos.usuario) || datos.usuario;
+    const nuevaClave = prompt("Nueva clave:", datos.clave || '') || datos.clave;
+    datos.usuario = nuevoNombre;
+    datos.clave = nuevaClave;
+    localStorage.setItem(key, JSON.stringify(datos));
+    mostrarStats();
+}
 </script>
+
 </body>
 </html>

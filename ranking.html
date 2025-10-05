@@ -1,39 +1,262 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ranking LCDM</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ranking Interactivo LCDM</title>
 <style>
-body{font-family:sans-serif;background:#111;color:#fff;padding:12px}
-.container{max-width:900px;margin:0 auto}
-.item{display:flex;align-items:center;justify-content:space-between;padding:10px;background:#222;margin:8px;border-radius:8px}
-.btn{background:gold;color:black;padding:6px 10px;border-radius:6px;border:none}
+body { font-family:sans-serif; background:#111; color:#fff; text-align:center; margin:0; padding:0; }
+h1 { color:gold; text-shadow:0 0 5px #fff; margin:1rem 0; }
+#ranking-container { max-width:600px; margin:1rem auto; background:#222; padding:1rem; border-radius:10px; }
+.ranking-item { display:flex; align-items:center; justify-content:space-between; padding:0.5rem 1rem; border-bottom:1px solid #444; cursor:pointer; transition: all 0.5s ease; }
+.ranking-item:hover { background:#333; }
+.ranking-item.me { background:#444; }
+.ranking-item img { width:40px; height:40px; border-radius:50%; margin-right:10px; object-fit:cover; border:1px solid gold; }
+.ranking-item span { font-size:1.1rem; }
+#perfil-publico { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#222; color:#fff; padding:1rem; border-radius:15px; z-index:10000; width:90%; max-width:500px; text-align:center; max-height:90%; overflow-y:auto; }
+#perfil-publico img { width:80px; height:80px; border-radius:50%; border:2px solid gold; object-fit:cover; margin-bottom:10px; }
+#perfil-publico button { padding:0.5rem 1rem; margin:0.5rem; border:none; border-radius:5px; background:gold; color:black; font-weight:bold; cursor:pointer; }
+#perfil-posts { display:flex; flex-direction:column; gap:10px; margin-top:10px; }
+.post { background:#333; padding:10px; border-radius:10px; text-align:left; }
+.post img { max-width:100%; border-radius:8px; margin-top:5px; }
+.post-actions { margin-top:5px; display:flex; gap:5px; align-items:center; }
+.post-actions span, .post-actions button { cursor:pointer; }
+.comment { margin-left:10px; font-size:0.9rem; padding:2px 5px; background:#444; border-radius:5px; }
+.badges { display:flex; gap:5px; justify-content:center; margin-top:5px; }
+.badges span { background:gold; color:black; padding:2px 5px; border-radius:5px; font-size:0.8rem; }
+#popups { position:fixed; top:10px; right:10px; display:flex; flex-direction:column-reverse; gap:10px; z-index:9999; }
+.popup { color:#000; padding:10px; border-radius:10px; display:flex; align-items:center; gap:8px; opacity:0; animation:fadeInOut 2.5s forwards; font-weight:bold; }
+@keyframes fadeInOut { 0%{opacity:0;} 10%{opacity:1;} 90%{opacity:1;} 100%{opacity:0;} }
+
+/* Confeti */
+.confetti-piece { position:fixed; width:10px; height:10px; background:gold; opacity:0.8; pointer-events:none; z-index:99999; animation:fall 3s linear forwards; }
+@keyframes fall { 0%{transform:translateY(0) rotate(0deg);} 100%{transform:translateY(100vh) rotate(360deg);} }
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>🏆 Ranking</h1>
-  <div id="list"></div>
-  <div style="text-align:right;margin-top:12px">
-    <button class="btn" onclick="location.href='album.html'">Volver</button>
-  </div>
+
+<h1>🏆 Ranking Interactivo LCDM</h1>
+<div id="ranking-container"></div>
+<a href="album.html" style="color:yellow;">⬅️ Volver al Álbum</a>
+
+<!-- Perfil overlay -->
+<div id="perfil-publico">
+  <img id="perfilPublicoAvatar" src="">
+  <h3 id="perfilPublicoNombre"></h3>
+  <p id="perfilPublicoPuntos"></p>
+  <p id="perfilPublicoBio"></p>
+  <div class="badges" id="perfilPublicoBadges"></div>
+  <h4>Posts:</h4>
+  <div id="perfil-posts"></div>
+  <button id="cerrarPerfilPublico">Cerrar</button>
 </div>
-<script src="frontend-api.js"></script>
+
+<div id="popups"></div>
+
 <script>
-async function loadRanking(){
-  const res = await getJSON('get_users.php');
-  const list = document.getElementById('list'); list.innerHTML='';
-  if(res.success && res.users){
-    res.users.sort((a,b)=> (b.puntos||0) - (a.puntos||0));
-    res.users.forEach((u, i)=>{
-      const div = document.createElement('div'); div.className='item';
-      div.innerHTML = `<div style="display:flex;align-items:center;gap:12px"><strong>${i+1}.</strong><img src="${u.avatar}" style="width:48px;height:48px;border-radius:50%"><div><strong>${u.usuario}</strong><div style="font-size:0.9rem;color:#ccc">${u.bio||''}</div></div></div><div>${u.puntos||0} pts</div>`;
-      list.appendChild(div);
-    });
-  } else list.innerHTML = '<p>No hay usuarios todavía</p>';
+// ---------------- VARIABLES ----------------
+let usuario = JSON.parse(localStorage.getItem('usuario'));
+let ranking = JSON.parse(localStorage.getItem('ranking')) || [];
+let prevPosition = null; // posición anterior del usuario
+
+if(usuario && !ranking.find(u=>u.nombre===usuario.nombre)){
+    ranking.push({...usuario, puntos:usuario.puntos || 0, bio:usuario.bio || '', publico:true});
 }
-loadRanking();
-setInterval(loadRanking, 5000);
+
+let usuarioPerfilAbierto = null;
+const contenedor = document.getElementById('ranking-container');
+const perfilPublico = document.getElementById('perfil-publico');
+const cerrarPerfilPublico = document.getElementById('cerrarPerfilPublico');
+const perfilPublicoAvatar = document.getElementById('perfilPublicoAvatar');
+const perfilPublicoNombre = document.getElementById('perfilPublicoNombre');
+const perfilPublicoPuntos = document.getElementById('perfilPublicoPuntos');
+const perfilPublicoBio = document.getElementById('perfilPublicoBio');
+const perfilPublicoBadges = document.getElementById('perfilPublicoBadges');
+const perfilPosts = document.getElementById('perfil-posts');
+const popups = document.getElementById('popups');
+
+// ---------------- POPUPS ----------------
+function showPopup(msg, tipo='info'){
+    const div = document.createElement('div');
+    div.className='popup';
+    div.style.background = tipo==='like' ? 'red' : tipo==='intercambio' ? 'blue' : 'gold';
+    div.textContent = msg;
+    popups.prepend(div);
+    setTimeout(()=> div.remove(),2500);
+}
+
+// ---------------- CONFETI ----------------
+function showConfetti(){
+    for(let i=0;i<50;i++){
+        const div=document.createElement('div');
+        div.className='confetti-piece';
+        div.style.left=Math.random()*window.innerWidth+'px';
+        div.style.background=`hsl(${Math.random()*360},100%,50%)`;
+        document.body.appendChild(div);
+        setTimeout(()=> div.remove(),3000);
+    }
+}
+
+// ---------------- RENDER RANKING ----------------
+function renderRanking(){
+    ranking.sort((a,b)=>b.puntos - a.puntos);
+    contenedor.innerHTML='';
+    ranking.forEach((u,index)=>{
+        const div=document.createElement('div');
+        div.className='ranking-item';
+        if(usuario && u.nombre===usuario.nombre) div.classList.add('me');
+
+        // Top 3 colores
+        let color='';
+        if(index===0) color='gold';
+        else if(index===1) color='silver';
+        else if(index===2) color='#cd7f32';
+        div.style.borderLeft=`5px solid ${color}`;
+
+        div.innerHTML=`
+            <div style="display:flex; align-items:center;">
+                <span>${index+1}.</span>
+                <img src="${u.avatar}" alt="Avatar">
+                <span>${u.nombre}</span>
+            </div>
+            <span>${u.puntos} pts</span>
+        `;
+        div.addEventListener('click', ()=> abrirPerfil(u));
+        contenedor.appendChild(div);
+
+        // Confeti si usuario sube de posición
+        if(usuario && u.nombre===usuario.nombre){
+            if(prevPosition !== null && index < prevPosition){
+                showConfetti();
+                showPopup(`🎉 ¡Subiste en el ranking!`);
+            }
+            prevPosition = index;
+        }
+    });
+}
+
+// ---------------- PERFIL ----------------
+function abrirPerfil(u){
+    if(!u.publico){ alert('Este perfil es privado'); return; }
+    usuarioPerfilAbierto = u.nombre;
+    perfilPublicoAvatar.src = u.avatar;
+    perfilPublicoNombre.textContent = u.nombre;
+    perfilPublicoPuntos.textContent = `${u.puntos} pts`;
+    perfilPublicoBio.textContent = u.bio || '';
+
+    // badges
+    perfilPublicoBadges.innerHTML='';
+    if(u.figuritas) u.figuritas.forEach(f=>{
+        const span = document.createElement('span');
+        span.textContent=f;
+        perfilPublicoBadges.appendChild(span);
+    });
+
+    renderPerfilPosts();
+    perfilPublico.style.display='block';
+}
+
+// ---------------- POSTS ----------------
+function renderPerfilPosts(){
+    if(!usuarioPerfilAbierto) return;
+    perfilPosts.innerHTML='';
+    for(let i=0;i<localStorage.length;i++){
+        const key=localStorage.key(i);
+        if(key.startsWith('post_')){
+            const post=JSON.parse(localStorage.getItem(key));
+            if(post.usuario===usuarioPerfilAbierto){
+                const div=document.createElement('div');
+                div.className='post';
+                div.innerHTML=`
+                    <p>${post.texto}</p>
+                    ${post.figurita?`<img src="https://i.ibb.co/781Qj0J/${post.figurita}.png">`:''}
+                    ${post.imagen?`<img src="${post.imagen}">`:''}
+                    <div class="post-actions">
+                        <span onclick="darLike('${key}')">❤️ <span id="like-${key}">${post.likes||0}</span></span>
+                        <span onclick="comentarPost('${key}')">💬 Comentar</span>
+                        <button onclick="intercambiar('${key}')">🔄 Intercambiar</button>
+                    </div>
+                    <div id="comments-${key}"></div>
+                `;
+                perfilPosts.appendChild(div);
+                renderComentarios(key);
+            }
+        }
+    }
+}
+
+// ---------------- LIKE, COMENTARIOS, INTERCAMBIO ----------------
+function darLike(key){
+    const post=JSON.parse(localStorage.getItem(key));
+    if(!post.usersLiked) post.usersLiked=[];
+    if(!post.usersLiked.includes(usuario.nombre)){
+        post.likes=(post.likes||0)+1;
+        post.usersLiked.push(usuario.nombre);
+        localStorage.setItem(key,JSON.stringify(post));
+        document.getElementById('like-'+key).textContent = post.likes;
+        showPopup(`👍 ${usuario.nombre} le dio like a ${post.usuario}`, 'like');
+        renderRanking();
+        renderPerfilPosts();
+    } else showPopup('Ya le diste like', 'like');
+}
+
+function comentarPost(key){
+    const txt=prompt('Escribe tu comentario:');
+    if(txt){
+        const post=JSON.parse(localStorage.getItem(key));
+        if(!post.comentarios) post.comentarios=[];
+        post.comentarios.push({usuario:usuario.nombre,texto:txt,avatar:usuario.avatar});
+        localStorage.setItem(key,JSON.stringify(post));
+        renderComentarios(key);
+        showPopup(`💬 ${usuario.nombre} comentó en el post de ${post.usuario}`);
+    }
+}
+
+function intercambiar(key){
+    const post=JSON.parse(localStorage.getItem(key));
+    const figuritasPost = post.figurita ? [post.figurita] : [];
+    const misFiguritas = usuario.figuritas || [];
+    if(figuritasPost.length && misFiguritas.length){
+        const figPost = figuritasPost[0];
+        const miFig = misFiguritas[0];
+        post.figurita = miFig;
+        usuario.figuritas[0] = figPost;
+        localStorage.setItem(key,JSON.stringify(post));
+        localStorage.setItem('usuario',JSON.stringify(usuario));
+        showPopup(`🔄 Intercambio realizado con ${post.usuario}`,'intercambio');
+        renderPerfilPosts();
+        renderRanking();
+    } else showPopup('No se puede intercambiar figuritas','intercambio');
+}
+
+function renderComentarios(key){
+    const post=JSON.parse(localStorage.getItem(key));
+    const div=document.getElementById('comments-'+key);
+    if(div){
+        div.innerHTML='';
+        if(post.comentarios){
+            post.comentarios.forEach(c=>{
+                const cdiv=document.createElement('div');
+                cdiv.className='comment';
+                cdiv.innerHTML=`<strong>${c.usuario}:</strong> ${c.texto}`;
+                div.appendChild(cdiv);
+            });
+        }
+    }
+}
+
+// ---------------- CERRAR PERFIL ----------------
+cerrarPerfilPublico.addEventListener('click', ()=> perfilPublico.style.display='none');
+
+// ---------------- AUTO REFRESH ----------------
+setInterval(()=>{
+    ranking = JSON.parse(localStorage.getItem('ranking')) || ranking;
+    renderRanking();
+    if(usuarioPerfilAbierto) renderPerfilPosts();
+},2000);
+
+// ---------------- INICIALIZAR ----------------
+renderRanking();
 </script>
 </body>
 </html>
