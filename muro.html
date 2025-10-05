@@ -1,110 +1,261 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Muro Global - LCDM</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#00ffff">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Muro ✨</title>
+<link rel="stylesheet" href="style.css">
 <style>
-body{font-family:sans-serif;background:#111;color:#fff;padding:12px}
-#top{display:flex;align-items:center;gap:8px}
-#feed{max-width:900px;margin:20px auto;display:flex;flex-direction:column;gap:12px}
-.post{background:#222;padding:12px;border-radius:10px}
-textarea{width:100%;min-height:80px;padding:8px;border-radius:8px;border:none}
-.btn{background:gold;color:black;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
-.preview img{max-width:160px;border-radius:8px;display:block;margin-top:8px}
+body { margin:0; font-family:sans-serif; background:#111; color:#fff; }
+#barra-superior { display:flex; align-items:center; gap:10px; background:#222; padding:10px; flex-wrap:wrap; }
+#barra-superior img { width:30px; height:30px; border-radius:50%; border:1px solid gold; }
+#barra-superior input { flex:1; padding:5px 10px; border-radius:5px; border:none; margin-left:10px; }
+#feed { max-width:800px; margin:20px auto; display:flex; flex-direction:column; gap:15px; }
+.post { background:#222; padding:15px; border-radius:10px; display:flex; flex-direction:column; gap:10px; }
+.post-header { display:flex; align-items:center; gap:10px; }
+.post-header img { width:40px; height:40px; border-radius:50%; border:1px solid gold; }
+.post-body img { max-width:100%; border-radius:10px; transition: transform 0.3s; }
+.post-body img:hover { transform: scale(1.05); }
+.post-actions { display:flex; gap:10px; align-items:center; }
+.post-comments { margin-top:10px; padding-left:50px; display:flex; flex-direction:column; gap:5px; }
+.comment { background:#333; padding:5px 10px; border-radius:5px; display:flex; align-items:center; gap:5px; }
+#nuevo-post { max-width:800px; margin:20px auto; display:flex; flex-direction:column; gap:10px; }
+#nuevo-post textarea { width:100%; padding:10px; border-radius:5px; border:none; resize:none; }
+#nuevo-post select, #nuevo-post button, #nuevo-post input[type=file] { padding:10px; border-radius:5px; border:none; font-weight:bold; cursor:pointer; }
+#nuevo-post select, #nuevo-post input[type=file] { background:#222; color:#fff; }
+#nuevo-post button { width:150px; background:gold; color:black; align-self:flex-end; transition: transform 0.2s; }
+#nuevo-post button:hover { transform: scale(1.05); }
+#preview { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+#preview img { max-width:100px; border-radius:10px; border:1px solid gold; }
+#chat-flotante { position:fixed; bottom:10px; right:10px; width:300px; background:#222; border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:5px; max-height:400px; overflow-y:auto; }
+#chat-mensajes { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:5px; }
+.chat-msg { display:flex; gap:5px; align-items:flex-end; max-width:80%; }
+.chat-msg img { width:25px; height:25px; border-radius:50%; }
+.chat-msg.mine { align-self:flex-end; flex-direction:row-reverse; }
+#chat-flotante input { width:100%; padding:5px; border-radius:5px; border:none; }
+#chat-flotante button { padding:5px 10px; border:none; border-radius:5px; background:gold; color:black; font-weight:bold; cursor:pointer; }
+#popups { position:fixed; top:10px; right:10px; display:flex; flex-direction:column-reverse; gap:10px; z-index:9999; }
+.popup { background:gold; color:#000; padding:10px; border-radius:10px; display:flex; align-items:center; gap:8px; opacity:0; animation:fadeInOut 2.5s forwards; }
+@keyframes fadeInOut { 0%{opacity:0;} 10%{opacity:1;} 90%{opacity:1;} 100%{opacity:0;} }
+.like-anim { animation:likePulse 0.3s; }
+@keyframes likePulse { 0%{transform:scale(1);} 50%{transform:scale(1.3);} 100%{transform:scale(1);} }
 </style>
 </head>
 <body>
-<div id="top">
-  <div id="usuarioInfo"></div>
-  <div style="margin-left:auto">
-    <button class="btn" onclick="location.href='album.html'">Volver al Álbum</button>
-    <button class="btn" onclick="location.href='ranking.html'">Ranking</button>
-    <button class="btn" id="btnLogout">Logout</button>
-  </div>
+
+<div id="barra-superior">
+  <img id="avatar-barra" src="" alt="Avatar">
+  <span id="usuarioActivo"></span>
+  <button id="btnLogout">Cerrar Sesión</button>
+  <button id="btnAlbum" onclick="location.href='album.html'">🏆 Volver al Álbum</button>
+  <input type="text" id="search" placeholder="Buscar posts o usuarios...">
 </div>
 
-<div id="newPost" style="max-width:900px;margin:14px auto;background:#111;padding:12px;border-radius:8px">
+<div id="nuevo-post">
   <textarea id="postTexto" placeholder="Escribe tu post..."></textarea>
+  <select id="postFigurita"></select>
   <input type="file" id="postImagen" accept="image/*">
-  <div class="preview" id="preview"></div>
-  <div style="text-align:right;margin-top:8px">
-    <button class="btn" id="btnPublicar">Publicar</button>
-  </div>
+  <div id="preview"></div>
+  <button id="btnCrearPost">Publicar</button>
 </div>
 
 <div id="feed"></div>
 
-<script src="frontend-api.js"></script>
-<script>
-function getSessionUsuario(){ const s = sessionStorage.getItem('lcdm_usuario'); if(!s) return null; try{return JSON.parse(s);}catch(e){return null;} }
-const usuario = getSessionUsuario();
-if(!usuario){ location.href='index.html'; }
-document.getElementById('usuarioInfo').innerHTML = `<img src="${usuario.avatar}" style="width:40px;height:40px;border-radius:50%;vertical-align:middle;margin-right:8px"> <strong>${usuario.usuario}</strong>`;
-document.getElementById('btnLogout').addEventListener('click', ()=>{ sessionStorage.removeItem('lcdm_usuario'); location.href='index.html'; });
+<div id="chat-flotante">
+  <div id="chat-mensajes"></div>
+  <input type="text" id="chat-input" placeholder="Escribir mensaje...">
+  <button id="btnEnviarChat">Enviar</button>
+</div>
 
-const postImagenInput = document.getElementById('postImagen');
-const preview = document.getElementById('preview');
-postImagenInput.addEventListener('change', ()=>{
-  const file = postImagenInput.files[0];
-  if(!file) { preview.innerHTML=''; return; }
-  const reader = new FileReader();
-  reader.onload = ()=> preview.innerHTML = `<img src="${reader.result}">`;
-  reader.readAsDataURL(file);
+<div id="popups"></div>
+
+<script>
+// ---------------- USUARIO ----------------
+let usuario = JSON.parse(localStorage.getItem('usuario')) || {
+  nombre:'Cofundador',
+  avatar:'https://i.ibb.co/781Qj0J/logo.png',
+  figuritas:['A','B','C']
+};
+document.getElementById('usuarioActivo').textContent = usuario.nombre;
+document.getElementById('avatar-barra').src = usuario.avatar;
+
+// ---------------- POPUPS ----------------
+function showPopup(msg, avatar=''){
+  const popups = document.getElementById('popups');
+  const div = document.createElement('div');
+  div.className='popup';
+  div.innerHTML = avatar ? `<img src="${avatar}" style="width:30px;height:30px;border-radius:50%;margin-right:5px;">${msg}` : msg;
+  popups.prepend(div);
+  setTimeout(()=>div.remove(),2500);
+}
+
+// ---------------- FIGURITAS ----------------
+const selectFigurita = document.getElementById('postFigurita');
+function cargarFiguritas(){
+  selectFigurita.innerHTML='';
+  usuario.figuritas.forEach(f=>{
+    const opt = document.createElement('option');
+    opt.value=f; opt.textContent=f;
+    selectFigurita.appendChild(opt);
+  });
+}
+cargarFiguritas();
+
+// ---------------- PREVIEW ----------------
+const postImagen=document.getElementById('postImagen');
+const preview=document.getElementById('preview');
+selectFigurita.addEventListener('change', updatePreview);
+postImagen.addEventListener('change', updatePreview);
+function updatePreview(){
+  preview.innerHTML='';
+  if(selectFigurita.value){
+    const img=document.createElement('img');
+    img.src=`https://i.ibb.co/781Qj0J/${selectFigurita.value}.png`;
+    preview.appendChild(img);
+  }
+  if(postImagen.files[0]){
+    const reader=new FileReader();
+    reader.onload=()=>{ const img=document.createElement('img'); img.src=reader.result; preview.appendChild(img); }
+    reader.readAsDataURL(postImagen.files[0]);
+  }
+}
+
+// ---------------- POSTS ----------------
+async function cargarPostsAPI(filter=''){
+  const res = await fetch(`api/obtener_posts.php?filter=${encodeURIComponent(filter)}`);
+  const posts = await res.json();
+  const feed = document.getElementById('feed'); feed.innerHTML='';
+  posts.forEach(post=>{
+    const div=document.createElement('div'); div.className='post';
+    div.innerHTML=`
+      <div class="post-header"><img src="${post.avatar}"><strong>${post.usuario}</strong></div>
+      <div class="post-body"><p>${post.texto}</p>
+        ${post.figurita?`<img src="https://i.ibb.co/781Qj0J/${post.figurita}.png">`:''}
+        ${post.imagen?`<img src="${post.imagen}">`:''}
+      </div>
+      <div class="post-actions">
+        <span class="likeBtn" data-id="${post.id}">❤️ <span id="like-${post.id}">${post.likes}</span></span>
+        <button onclick="comentarPost(${post.id})">💬 Comentar</button>
+      </div>
+      <div class="post-comments" id="comments-${post.id}"></div>
+    `;
+    feed.appendChild(div);
+    mostrarComentariosAPI(post.id, post.comentarios);
+  });
+}
+
+async function mostrarComentariosAPI(postId, comentarios){
+  const div=document.getElementById('comments-'+postId); div.innerHTML='';
+  comentarios.forEach(c=>{
+    const cDiv=document.createElement('div'); cDiv.className='comment';
+    cDiv.innerHTML=`<img src="${c.avatar}" style="width:20px;height:20px;border-radius:50%;margin-right:5px;"><strong>${c.usuario}:</strong> ${c.texto}`;
+    div.appendChild(cDiv);
+  });
+}
+
+// ---------------- CREAR POST ----------------
+document.getElementById('btnCrearPost').addEventListener('click', async ()=>{
+  const texto=document.getElementById('postTexto').value;
+  const figurita=selectFigurita.value;
+  let imagen='';
+  if(postImagen.files[0]){
+    const reader=new FileReader();
+    reader.onload=async ()=>{
+      imagen=reader.result;
+      await guardarPostAPI(texto, figurita, imagen);
+    }
+    reader.readAsDataURL(postImagen.files[0]);
+  }else{
+    await guardarPostAPI(texto, figurita, imagen);
+  }
 });
 
-async function fetchPosts(){
-  const res = await getJSON('get_posts.php');
-  const feed = document.getElementById('feed'); feed.innerHTML='';
-  if(res.success && res.posts){
-    res.posts.forEach(p => {
-      const div = document.createElement('div'); div.className='post';
-      div.innerHTML = `
-        <div style="display:flex;gap:10px;align-items:center">
-          <img src="${p.avatar}" style="width:48px;height:48px;border-radius:50%">
-          <strong>${p.usuario}</strong> <small style="color:#aaa;margin-left:8px">${p.created_at}</small>
-        </div>
-        <p style="margin-top:8px">${p.texto || ''}</p>
-        ${p.figurita?`<img src="https://i.ibb.co/781Qj0J/${p.figurita}.png" style="max-width:200px;border-radius:8px">`:''}
-        ${p.imagen?`<img src="${p.imagen}" style="max-width:400px;border-radius:8px;margin-top:8px">`:''}
-        <div style="margin-top:8px">
-          <button class="btn" onclick="darLike(${p.id})">❤️ <span id="like-${p.id}">${p.likes||0}</span></button>
-        </div>
-      `;
-      feed.appendChild(div);
-    });
-  } else {
-    feed.innerHTML = '<p>No hay posts</p>';
+async function guardarPostAPI(texto, figurita, imagen){
+  if(!texto && !figurita && !imagen){ showPopup('Agrega texto, figurita o imagen', usuario.avatar); return; }
+  const formData = new FormData();
+  formData.append('usuario', usuario.nombre);
+  formData.append('avatar', usuario.avatar);
+  formData.append('texto', texto);
+  formData.append('figurita', figurita);
+  formData.append('imagen', imagen);
+  const res = await fetch('api/guardar_post.php',{method:'POST',body:formData});
+  const data = await res.json();
+  if(data.status==='ok'){
+    document.getElementById('postTexto').value=''; postImagen.value=''; selectFigurita.value=''; preview.innerHTML='';
+    cargarPostsAPI(document.getElementById('search').value);
+    showPopup('Post publicado! 🔥', usuario.avatar);
   }
 }
 
-async function publicarPost(){
-  const texto = document.getElementById('postTexto').value.trim();
-  let imagen = '';
-  if(postImagenInput.files[0]){
-    imagen = await new Promise((resolve)=>{
-      const r = new FileReader();
-      r.onload = ()=> resolve(r.result);
-      r.readAsDataURL(postImagenInput.files[0]);
-    });
+// ---------------- LIKE ----------------
+document.addEventListener('click', async e=>{
+  if(e.target.classList.contains('likeBtn')){
+    const id=e.target.dataset.id;
+    await fetch('api/like_post.php',{method:'POST',body:new URLSearchParams({id})});
+    cargarPostsAPI(document.getElementById('search').value);
   }
-  const body = { usuario: usuario.usuario, texto, imagen };
-  const res = await postJSON('create_post.php', body);
-  if(res.success){ document.getElementById('postTexto').value=''; postImagenInput.value=''; preview.innerHTML=''; fetchPosts(); alert('Publicado!'); }
-  else alert(res.message || 'Error al publicar');
+});
+
+// ---------------- COMENTARIOS ----------------
+async function comentarPost(id){
+  const texto=prompt('Escribí tu comentario:');
+  if(!texto) return;
+  const formData=new FormData();
+  formData.append('post_id', id);
+  formData.append('usuario', usuario.nombre);
+  formData.append('avatar', usuario.avatar);
+  formData.append('texto', texto);
+  await fetch('api/comentar_post.php',{method:'POST',body:formData});
+  cargarPostsAPI(document.getElementById('search').value);
+  showPopup(`${usuario.nombre} comentó en el post`, usuario.avatar);
 }
 
-async function darLike(post_id){
-  const res = await postJSON('like_post.php', { usuario: usuario.usuario, post_id });
-  if(res.success){ const span = document.getElementById('like-'+post_id); if(span) span.textContent = parseInt(span.textContent||'0')+1; }
-  else alert(res.message || 'Error like');
+// ---------------- CHAT ----------------
+const chatInput=document.getElementById('chat-input');
+const chatMensajes=document.getElementById('chat-mensajes');
+
+document.getElementById('btnEnviarChat').addEventListener('click', async ()=>{
+  const msg=chatInput.value.trim(); if(!msg) return;
+  const formData=new FormData();
+  formData.append('usuario', usuario.nombre);
+  formData.append('avatar', usuario.avatar);
+  formData.append('texto', msg);
+  await fetch('api/chat.php',{method:'POST',body:formData});
+  chatInput.value='';
+  cargarChatAPI();
+  showPopup(`${usuario.nombre}: ${msg}`, usuario.avatar);
+});
+
+async function cargarChatAPI(){
+  const res=await fetch('api/chat.php');
+  const chats=await res.json();
+  chatMensajes.innerHTML='';
+  chats.forEach(c=>{
+    const div=document.createElement('div'); div.className='chat-msg'+(c.usuario===usuario.nombre?' mine':'');
+    div.innerHTML=`<img src="${c.avatar}"><span>${c.texto}</span>`;
+    chatMensajes.appendChild(div);
+  });
+  chatMensajes.scrollTop=chatMensajes.scrollHeight;
 }
 
-document.getElementById('btnPublicar').addEventListener('click', publicarPost);
+// ---------------- LOGOUT ----------------
+document.getElementById('btnLogout').addEventListener('click',()=>{
+  localStorage.removeItem('usuario');
+  location.href='album.html';
+});
 
-fetchPosts();
-setInterval(fetchPosts, 3500); // refrezca cada 3.5s
+// ---------------- BUSCADOR ----------------
+document.getElementById('search').addEventListener('input', e=> cargarPostsAPI(e.target.value));
+
+// ---------------- AUTO REFRESH ----------------
+setInterval(()=>{
+  cargarPostsAPI(document.getElementById('search').value);
+  cargarChatAPI();
+},3000);
+
+// ---------------- INICIALIZAR ----------------
+cargarPostsAPI();
+cargarChatAPI();
 </script>
 </body>
 </html>

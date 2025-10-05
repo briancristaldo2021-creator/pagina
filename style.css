@@ -1,316 +1,235 @@
-
-/* ==============================
-   Estilos generales
-   ============================== */
+/* ---------------- BODY ---------------- */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #000; /* Fondo negro sólido */
-    color: #00ffff;
-    margin: 0;
-    padding: 0;
-    text-align: center;
+  margin: 0;
+  font-family: sans-serif;
+  background: #111;
+  color: #fff;
 }
 
-/* Logo */
-#logo-container {
-    text-align: center;
-    margin: 20px 0;
-}
-#logo-container img {
-    width: 150px;
-    cursor: pointer;
-    transition: transform 0.3s;
-}
-#logo-container img:hover {
-    transform: scale(1.1);
-}
-
-/* Barra superior */
+/* ---------------- BARRA SUPERIOR ---------------- */
 #barra-superior {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    background: #000;
-    padding: 10px 0;
-    box-shadow: 0 0 10px #00ffff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #222;
+  padding: 10px;
+  flex-wrap: wrap;
 }
-#barra-superior span {
-    font-weight: bold;
+#barra-superior img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid gold;
 }
-#barra-superior button {
-    background: linear-gradient(45deg, #ff00ff, #00ffff);
-    color: #000;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s;
-    box-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff;
-}
-#barra-superior button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff;
-    color: white;
+#barra-superior input {
+  flex: 1;
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: none;
+  margin-left: 10px;
 }
 
-/* Contenedor del álbum */
-#album-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 20px auto;
-    background: #000; /* Fondo negro sólido */
+/* ---------------- FEED ---------------- */
+#feed {
+  max-width: 800px;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
-#album-container h1 {
-    margin-bottom: 20px;
-    color: #00ffff;
+.post {
+  background: #222;
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transform: translateY(-20px);
+  opacity: 0;
+  animation: slideFadeIn 0.5s forwards;
 }
-button:hover {
-    box-shadow: 0 0 15px #ff00ff, 0 0 30px #00ffff;
-    transform: scale(1.1) rotate(-2deg);
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-/* Tooltip flotante */
-#tooltipAyuda {
-    display: none;
-    position: absolute;
-    top: 45px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 280px;
-    background: #000; /* Fondo negro */
-    color: #00ffff;
-    font-weight: bold;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,255,255,0.3), 0 0 15px #ff00ff;
-    z-index: 1000;
-    animation: desplegar 0.3s ease;
+.post-header img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid gold;
 }
-.tooltipFlecha {
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid #000;
+.post-body img {
+  max-width: 100%;
+  border-radius: 10px;
+  transition: transform 0.3s;
 }
-.tooltipContenido {
-    max-height: 200px;
-    overflow-y: auto;
-    padding: 15px;
+.post-body img:hover {
+  transform: scale(1.05);
 }
-#tooltipAyuda h3 {
-    margin-top: 0;
-    text-align: center;
-    font-size: 16px;
+.post-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
-.tooltipContenido::-webkit-scrollbar {
-    width: 6px;
+.post-comments {
+  margin-top: 10px;
+  padding-left: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
-.tooltipContenido::-webkit-scrollbar-track {
-    background: rgba(255,255,255,0.05);
-    border-radius: 3px;
-}
-.tooltipContenido::-webkit-scrollbar-thumb {
-    background: rgba(0,255,255,0.5);
-    border-radius: 3px;
-}
-@keyframes desplegar {
-    from { opacity: 0; transform: translate(-50%, -10px); }
-    to { opacity: 1; transform: translate(-50%, 0); }
+.comment {
+  background: #333;
+  padding: 5px 10px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
-/* Figuritas */
-.figuritas {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    max-width: 800px;
+/* ---------------- NUEVO POST ---------------- */
+#nuevo-post {
+  max-width: 800px;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
-.figurita {
-    background: #000; /* Fondo negro */
-    color: #00ffff;
-    width: 120px;
-    height: 160px;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 15px #00ffff, 0 0 30px #ff00ff;
-    font-weight: bold;
-    transition: transform 0.3s, border 0.3s, box-shadow 0.3s;
-    text-align: center;
-    padding: 5px;
+#nuevo-post textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  resize: none;
 }
-.figurita:hover {
-    transform: scale(1.1) rotate(-2deg);
-    box-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff;
+#nuevo-post select,
+#nuevo-post button,
+#nuevo-post input[type=file] {
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
 }
-.figurita img {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 5px;
-    border-radius: 6px;
-    filter: grayscale(100%);
-    transition: filter 0.5s ease;
+#nuevo-post select,
+#nuevo-post input[type=file] {
+  background: #222;
+  color: #fff;
 }
-.figurita.coleccionada img {
-    filter: grayscale(0%);
+#nuevo-post button {
+  width: 150px;
+  background: gold;
+  color: black;
+  align-self: flex-end;
+  transition: transform 0.2s;
 }
-.figurita.coleccionada {
-    border: 3px solid #00ff00;
-    transform: scale(1.1);
-    animation: desbloqueo 1s ease, glow 2s infinite alternate;
+#nuevo-post button:hover {
+  transform: scale(1.05);
 }
-@keyframes desbloqueo {
-    0% { transform: scale(0.5) rotate(-20deg); opacity: 0; }
-    50% { transform: scale(1.2) rotate(10deg); opacity: 1; }
-    100% { transform: scale(1.1) rotate(0); }
+#preview {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
 }
-@keyframes glow {
-    0% { box-shadow: 0 0 15px #00ff00; }
-    50% { box-shadow: 0 0 25px #00ff00, 0 0 50px #00ff00; }
-    100% { box-shadow: 0 0 15px #00ff00; }
+#preview img {
+  max-width: 100px;
+  border-radius: 10px;
+  border: 1px solid gold;
 }
 
-/* QR Section */
-.qr-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 20px 0;
-    background: #000; /* Fondo negro */
-    padding: 10px;
-    border-radius: 10px;
+/* ---------------- CHAT FLOTAANTE ---------------- */
+#chat-flotante {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  width: 300px;
+  background: #222;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 400px;
+  overflow-y: auto;
 }
-#btnScanQR {
-    background: linear-gradient(45deg, #ff00ff, #00ffff);
-    color: #000;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s;
-    box-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff;
+#chat-mensajes {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
-#btnScanQR:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff;
-    color: white;
+.chat-msg {
+  display: flex;
+  gap: 5px;
+  align-items: flex-end;
+  max-width: 80%;
 }
-#qr-reader {
-    width: 300px;
-    margin-top: 10px;
+.chat-msg img {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
 }
-
-/* Toast (notificaciones) */
-#toast {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #000;
-    color: #00ffff;
-    padding: 12px 20px;
-    border-radius: 6px;
-    box-shadow: 0 0 10px #00ffff;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.5s ease;
-    z-index: 2000;
+.chat-msg.mine {
+  align-self: flex-end;
+  flex-direction: row-reverse;
 }
-#toast.visible { opacity: 1; pointer-events: auto; }
-
-/* Overlay de completado */
-#completado-overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: #000;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #00ffff;
-    font-size: 2rem;
-    text-align: center;
-    z-index: 3000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 1s ease;
+#chat-flotante input {
+  width: 100%;
+  padding: 5px;
+  border-radius: 5px;
+  border: none;
 }
-#completado-overlay.visible { opacity: 1; pointer-events: auto; }
-#completado-overlay h1 {
-    font-size: 3rem;
-    color: gold;
-    text-shadow: 0 0 10px #fff, 0 0 20px yellow, 0 0 30px #ff0;
-    animation: parpadeo 1s infinite alternate;
-}
-@keyframes parpadeo {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.8; transform: scale(1.1); }
-    100% { opacity: 1; transform: scale(1); }
+#chat-flotante button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  background: gold;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
 }
 
-/* Responsivo */
-@media (max-width: 600px) {
-    .figuritas { gap: 10px; }
-    .figurita { width: 90px; height: 120px; }
-    .figurita img { width: 60px; height: 60px; }
-    #barra-superior { flex-direction: column; gap: 10px; }
-    #tooltipAyuda { width: 220px; }
+/* ---------------- POPUPS ---------------- */
+#popups {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+  z-index: 9999;
+}
+.popup {
+  background: gold;
+  color: #000;
+  padding: 10px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  animation: fadeInOut 2.5s forwards;
 }
 
-
-</style>
-</head>
-<body>
-
-<!-- Logo -->
-<div id="logo-container">
-  <a href="index.html"><img src="https://i.ibb.co/781Qj0J/logo.png" alt="Logo Los LCDM" id="logo"></a>
-</div>
-
-<!-- Barra superior -->
-<div id="barra-superior">
-  <img id="avatar-barra" src="https://i.ibb.co/781Qj0J/logo.png" alt="Avatar">
-  <span id="usuarioActivo">Cofundador</span>
-  <span id="contador">0 / 5 Colección</span>
-  <button id="btnAyuda">Ayuda</button>
-  <button id="btnReiniciar">&#127873; Canjear Premio</button>
-  <button id="btnLogout">Cerrar Sesión</button>
-  <a href="ranking.html">🏆 Ranking</a>
-  <button id="btnPerfil">⚙️ Perfil</button>
-  <button id="btnCofundador" style="display:none;">👑 Panel Cofundador</button>
-</div>
-
-<!-- Álbum -->
-<div id="album-container">
-  <h1>Mi Propia Colección</h1>
-  <div class="figuritas" id="figuritasContainer"></div>
-</div>
-
-<!-- Escaneo QR -->
-<div class="qr-section">
-  <div id="qr-reader"></div>
-  <button id="btnScanQR">&#128247; Coleccionar QR</button>
-</div>
-
-<!-- Toast y Overlay -->
-<div id="toast"></div>
-<div id="completado-overlay"><h1>¡Colección Completa!</h1></div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://unpkg.com/html5-qrcode"></script>
-<script src="codigos.js"></script>
-<script src="qr.js"></script>
-<script src="script.js"></script>
-</body>
-</html>
+/* ---------------- ANIMACIONES ---------------- */
+@keyframes fadeInOut {
+  0%{opacity:0;}
+  10%{opacity:1;}
+  90%{opacity:1;}
+  100%{opacity:0;}
+}
+@keyframes slideFadeIn {
+  0%{opacity:0;transform:translateY(-20px);}
+  100%{opacity:1;transform:translateY(0);}
+}
+.like-anim {
+  animation: likePulse 0.3s;
+}
+@keyframes likePulse {
+  0%{transform:scale(1);}
+  50%{transform:scale(1.3);}
+  100%{transform:scale(1);}
+}
