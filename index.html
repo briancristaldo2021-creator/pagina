@@ -1,175 +1,77 @@
 <!DOCTYPE html>
 <html lang="es">
-
-
 <head>
-	<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#00ffff">
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bienvenido a la coleccion LCDM</title>
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-
-  body { 
-    font-family:'Arial', sans-serif; 
-    background:#0d0d0d; 
-    color:#00ffffaA; 
-    display:flex; 
-    justify-content:center; 
-    align-items:center; 
-    min-height:100vh; 
-    flex-direction:column; 
-  }
-
-  /* Logo arriba */
-  #logo-container {
-    position: absolute;
-    top: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-  }
-  #logo {
-    max-width: 150px;
-    height: auto;
-    cursor: pointer;
-    transition: transform 0.3s;
-  }
-  #logo:hover { transform: scale(1.1); }
-
-  /* Overlay de bienvenida */
-  #bienvenida { 
-    position:fixed; top:0; left:0; width:100%; height:100%;
-    background:#000; display:flex; flex-direction:column; justify-content:center; align-items:center;
-    font-size:2rem; text-align:center; z-index:1000; opacity:1; transition:opacity 1.5s ease;
-  }
-  #bienvenida button { 
-    margin-top:20px; padding:10px 20px; font-size:1rem; 
-    background:#00ffff; border:none; border-radius:8px; cursor:pointer; color:#0d0d0d; transition:all 0.3s; 
-  }
-  #bienvenida button:hover { background:#009999; }
-
-  /* Cuadro login/registro centrado */
-  #login-container {
-    display:none;
-    flex-direction:column;
-    align-items:center;
-    background:#111;
-    padding:40px;
-    border-radius:12px;
-    box-shadow:0 0 20px #00ffff;
-    margin-top:80px;
-    width:300px;
-    text-align:center;
-  }
-  #login-container h2 { margin-bottom:20px; }
-  #login-container input {
-    margin:10px 0; padding:10px; width:100%; border-radius:6px; border:none;
-  }
-  #login-container button {
-    margin-top:10px; padding:10px 20px; border-radius:6px; border:none;
-    background:#00ffff; color:#0d0d0d; font-weight:bold; cursor:pointer; transition:all 0.3s;
-  }
-  #login-container button:hover { background:#009999; color:white; }
-  #mensaje { margin-top:10px; font-weight:bold; }
-
-  /* Acceso Cofundador */
-  #accesoCofundador { margin-top:20px; text-align:center; }
-  #accesoCofundador button { 
-    background:gold; color:#000; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:bold;
-    transition:0.3s; box-shadow: 0 0 10px gold;
-  }
-  #accesoCofundador button:hover { background:#ffdd00; transform: scale(1.05); }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LCDM - Login</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#00ffff">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Arial, sans-serif;background:#0d0d0d;color:#00ffffaA;min-height:100vh;display:flex;align-items:center;justify-content:center}
+    .card{background:#111;padding:28px;border-radius:12px;box-shadow:0 0 30px #000;max-width:360px;width:100%;text-align:center}
+    input{width:100%;padding:10px;margin:8px 0;border-radius:6px;border:none}
+    button{background:#00ffff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:bold}
+    .secondary{background:gold;color:#000;margin-top:8px}
+    #mensaje{margin-top:8px;font-weight:bold}
+  </style>
 </head>
 <body>
-
-<!-- Logo arriba -->
-<div id="logo-container">
-    <img src="img/logo.png" alt="Logo Los LCDM" id="logo">
-</div>
-
-<!-- Overlay de bienvenida -->
-<div id="bienvenida">
-  <h1>¡Bienvenido A la Coleccion LCDM!</h1>
-  <p>Registrate o inicia sesión para comenzar</p>
-  <button onclick="cerrarBienvenida()">Comenzar</button>
-</div>
-
-<!-- Login / Registro -->
-<div id="login-container">
-  <h2>Registro / Iniciar</h2>
-  <input type="text" id="usuario" placeholder="Usuario">
-  <input type="password" id="password" placeholder="Contraseña">
-  <button onclick="registrarOLogin()">Ingresar</button>
-  <p id="mensaje"></p>
-  <p>¿No tenés cuenta? <a href="registro.html">Registrate aquí</a></p>
-  
-  <!-- Acceso Cofundador -->
-  <div id="accesoCofundador">
-    <button id="btnEntrarCofundador">Acceso Cofundador 🔒</button>
+  <div class="card">
+    <h2>Bienvenido a LCDM</h2>
+    <input id="usuario" placeholder="Usuario" autocomplete="username">
+    <input id="password" type="password" placeholder="Contraseña" autocomplete="current-password">
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">
+      <button id="btnLogin">Ingresar</button>
+      <button id="btnRegister" class="secondary">Registrarme</button>
+    </div>
+    <p id="mensaje"></p>
+    <p style="margin-top:12px;font-size:0.9rem">¿Tenés problemas? Revisá la consola (F12)</p>
   </div>
-</div>
 
+<script src="frontend-api.js"></script>
 <script>
-// ==============================
-// Overlay de bienvenida
-// ==============================
-function cerrarBienvenida() {
-  const overlay = document.getElementById('bienvenida');
-  overlay.style.opacity = 0;
-  setTimeout(() => {
-    overlay.style.display = 'none';
-    document.getElementById('login-container').style.display = 'flex';
-  }, 1000);
-}
-
-// ==============================
-// Registro / Login normal
-// ==============================
-function registrarOLogin() {
+document.getElementById('btnLogin').addEventListener('click', async ()=>{
   const usuario = document.getElementById('usuario').value.trim();
-  const password = document.getElementById('password').value.trim();
-  const mensaje = document.getElementById('mensaje');
-
-  if(!usuario || !password){
-      mensaje.textContent = "Completa todos los campos";
-      mensaje.style.color = "red";
-      return;
-  }
-
-  const key = 'user_' + usuario;
-  const datosGuardados = localStorage.getItem(key);
-
-  if(datosGuardados){
-      const userObj = JSON.parse(datosGuardados);
-      if(userObj.password === password){
-          localStorage.setItem('usuarioActivo', usuario);
-          window.location.href = 'album.html';
-      } else {
-          mensaje.textContent = "Contraseña incorrecta";
-          mensaje.style.color = "red";
-      }
-  } else {
-      localStorage.setItem(key, JSON.stringify({usuario, password, figuritas: [], coins:0, avatar:'https://i.ibb.co/781Qj0J/logo.png', publico:false, bio:''}));
-      localStorage.setItem('usuarioActivo', usuario);
+  const password = document.getElementById('password').value;
+  const msg = document.getElementById('mensaje');
+  msg.textContent = '';
+  if(!usuario || !password){ msg.textContent = 'Completá usuario y contraseña'; return; }
+  try{
+    const res = await postJSON('login.php', { usuario, password });
+    if(res.success){
+      // Guardamos usuario en sessionStorage para mantener sesión en frontend
+      sessionStorage.setItem('lcdm_usuario', JSON.stringify(res.usuario));
       window.location.href = 'album.html';
+    } else {
+      msg.textContent = res.message || 'Error en login';
+    }
+  }catch(err){
+    console.error(err);
+    msg.textContent = 'Error de conexión al servidor';
   }
-}
+});
 
-// Enter para enviar
-document.getElementById('password').addEventListener('keypress', e => { if(e.key==='Enter') registrarOLogin(); });
-document.getElementById('usuario').addEventListener('keypress', e => { if(e.key==='Enter') registrarOLogin(); });
-
-// ==============================
-// Acceso Cofundador
-// ==============================
-document.getElementById('btnEntrarCofundador').addEventListener('click', ()=>{
-    window.location.href='panel.html';
+document.getElementById('btnRegister').addEventListener('click', async ()=>{
+  const usuario = document.getElementById('usuario').value.trim();
+  const password = document.getElementById('password').value;
+  const msg = document.getElementById('mensaje');
+  msg.textContent = '';
+  if(!usuario || !password){ msg.textContent = 'Completá usuario y contraseña'; return; }
+  try{
+    const res = await postJSON('register.php', { usuario, password });
+    if(res.success){
+      msg.style.color = 'lightgreen';
+      msg.textContent = 'Registrado correctamente. Podés ingresar.';
+    } else {
+      msg.style.color = 'yellow';
+      msg.textContent = res.message || 'Error en registro';
+    }
+  }catch(err){
+    console.error(err);
+    msg.textContent = 'Error de conexión al servidor';
+  }
 });
 </script>
-
 </body>
 </html>
