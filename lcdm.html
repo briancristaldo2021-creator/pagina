@@ -4,8 +4,163 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Álbum Completo LCDM</title>
-<link rel="stylesheet" href="style.css">
-<script src="codigos.js"></script>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0d0d0d, #1a1a1a);
+    color: #fff;
+    margin: 0;
+    overflow-x: hidden;
+  }
+
+  /* Overlay */
+  #overlay {
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: rgba(0,0,0,0.95);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:2rem;
+    text-align:center;
+    opacity:1;
+    transition: opacity 2s ease;
+    z-index:1000;
+  }
+
+  /* Álbum */
+  #album {
+    opacity:0;
+    transition: opacity 2s ease;
+    padding:20px;
+    max-width: 1200px;
+    margin:auto;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  #album.visible { opacity:1; }
+
+  #album h1 {
+    font-size:2.8rem;
+    margin-bottom:15px;
+    text-shadow: 0 0 15px #ffd700;
+  }
+  #album p {
+    margin-bottom:20px;
+    font-size:1.2rem;
+    text-align:center;
+  }
+
+  /* Grid de figuritas */
+  .figuritas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    justify-items: center;
+    padding: 10px;
+  }
+
+  .figurita {
+    background: #222;
+    border-radius: 12px;
+    padding:5px;
+    text-align:center;
+    width:120px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor:pointer;
+    opacity:0;
+    animation: popIn 0.5s forwards;
+    position: relative;
+  }
+
+  .figurita img {
+    width:100px;
+    height:100px;
+    border-radius:10px;
+    object-fit:cover;
+    display:block;
+    margin:0 auto 5px;
+    transition: filter 0.5s, transform 0.3s;
+    filter: grayscale(100%) brightness(0.4);
+  }
+
+  .figurita.locked span {
+    color: #555;
+  }
+
+  .figurita.unlocked img {
+    filter: none;
+  }
+
+  .figurita.unlocked:hover {
+    transform: scale(1.2) rotate(3deg);
+    box-shadow: 0 0 30px #ffd700;
+  }
+
+  @keyframes popIn {
+    0% { opacity:0; transform: scale(0.5);}
+    100% { opacity:1; transform: scale(1);}
+  }
+
+  /* Efecto desbloqueo */
+  .shine {
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: linear-gradient(120deg, transparent 0%, rgba(255,215,0,0.6) 50%, transparent 100%);
+    transform: translateX(-100%);
+    animation: shine 1s forwards;
+    border-radius: 12px;
+  }
+  @keyframes shine {
+    0% { transform: translateX(-100%);}
+    100% { transform: translateX(100%);}
+  }
+
+  /* Modal */
+  #modalFigurita {
+    display:none;
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: rgba(0,0,0,0.95);
+    justify-content:center;
+    align-items:center;
+    z-index:2000;
+    animation: fadeIn 0.5s;
+  }
+  @keyframes fadeIn {
+    from { opacity:0;}
+    to { opacity:1;}
+  }
+
+  #modalContent {
+    background:#111;
+    padding:25px;
+    border-radius:20px;
+    max-width:400px;
+    text-align:center;
+    position:relative;
+    animation: popIn 0.3s;
+  }
+  #modalContent img {
+    width:200px;
+    height:200px;
+    border-radius:15px;
+    margin-bottom:15px;
+  }
+  #closeModal {
+    position:absolute;
+    top:10px;
+    right:15px;
+    cursor:pointer;
+    font-size:1.5rem;
+    color:#ffd700;
+    font-weight:bold;
+  }
+</style>
 </head>
 <body>
 
@@ -13,33 +168,88 @@
 
 <div id="album">
   <h1>¡Explorá el Álbum!</h1>
-  <p>Aquí van las fotos y recuerdos de Los LCDM.</p>
+  <p>Descubrí las 33 figuritas de Los LCDM. ¡Desbloquealas haciendo clic!</p>
   <div class="figuritas" id="figuritasPreview"></div>
 </div>
 
+<!-- Modal -->
+<div id="modalFigurita">
+  <div id="modalContent">
+    <span id="closeModal">&times;</span>
+    <img id="modalImg" src="" alt="">
+    <h2 id="modalName" style="color:#ffd700;margin:10px 0;"></h2>
+    <p id="modalInfo"></p>
+  </div>
+</div>
+
 <script>
-// Preview de figuritas desde codigos.js
+// Crear 33 figuritas bloqueadas al inicio
+const figuritasData = [];
+for(let i=1;i<=33;i++){
+  figuritasData.push({
+    nombre: `Figurita ${i}`,
+    imgColor: `https://via.placeholder.com/150?text=${i}`,
+    info: `Esta es la figurita número ${i}.`
+  });
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   const cont = document.getElementById("figuritasPreview");
-  figuritasData.forEach(fig => {
-    const div = document.createElement("div");
-    div.className = "figurita";
-    div.innerHTML = `<img src=\"${fig.imgColor}\" alt=\"${fig.nombre}\"><span>${fig.nombre}</span>`;
+  const modal = document.getElementById('modalFigurita');
+  const modalImg = document.getElementById('modalImg');
+  const modalName = document.getElementById('modalName');
+  const modalInfo = document.getElementById('modalInfo');
+  const closeModal = document.getElementById('closeModal');
+
+  const unlockSound = new Audio('https://www.myinstants.com/media/sounds/mario-coin.mp3'); // sonido desbloqueo
+  const clickSound = new Audio('https://www.soundjay.com/buttons/sounds/button-16.mp3');   // sonido abrir modal
+
+  figuritasData.forEach((fig, index)=>{
+    const div = document.createElement('div');
+    div.className = 'figurita locked';
+    div.style.animationDelay = (index*0.05)+'s';
+    div.innerHTML = `<img src="${fig.imgColor}" alt="${fig.nombre}"><span>${fig.nombre}</span>`;
+
+    div.addEventListener('click', ()=>{
+      // Si está bloqueada, se desbloquea con brillo + sonido
+      if(div.classList.contains('locked')){
+        div.classList.remove('locked');
+        div.classList.add('unlocked');
+        unlockSound.play();
+
+        // Efecto brillo
+        const shine = document.createElement('div');
+        shine.className = 'shine';
+        div.appendChild(shine);
+        setTimeout(()=>shine.remove(),1000);
+      }
+
+      // Abrir modal
+      clickSound.play();
+      modal.style.display='flex';
+      modalImg.src = fig.imgColor;
+      modalName.textContent = fig.nombre;
+      modalInfo.textContent = fig.info;
+    });
+
     cont.appendChild(div);
   });
-});
 
-// Animación overlay
-setTimeout(() => {
-  const overlay = document.getElementById('overlay');
-  const album = document.getElementById('album');
-  overlay.style.opacity = 0;
-  setTimeout(() => {
-    overlay.style.display = 'none';
-    album.classList.add('visible');
-    document.body.style.overflow = 'auto';
-  }, 2000);
-}, 3000);
+  closeModal.addEventListener('click', ()=> modal.style.display='none');
+  modal.addEventListener('click', e=>{ if(e.target===modal) modal.style.display='none'; });
+
+  // Overlay fade
+  setTimeout(()=>{
+    const overlay = document.getElementById('overlay');
+    const album = document.getElementById('album');
+    overlay.style.opacity=0;
+    setTimeout(()=>{
+      overlay.style.display='none';
+      album.classList.add('visible');
+      document.body.style.overflow='auto';
+    },2000);
+  },2000);
+});
 </script>
 
 </body>

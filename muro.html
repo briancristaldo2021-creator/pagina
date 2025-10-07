@@ -5,148 +5,198 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Muro Público - LCDM</title>
 <style>
-body { margin:0; font-family:sans-serif; background:#111; color:#fff; }
-#barra-superior { display:flex; align-items:center; gap:10px; background:#222; padding:10px; flex-wrap:wrap; }
-#barra-superior img { width:30px; height:30px; border-radius:50%; border:1px solid gold; }
-#barra-superior input { flex:1; padding:5px 10px; border-radius:5px; border:none; margin-left:10px; }
-#feed { max-width:800px; margin:20px auto; display:flex; flex-direction:column; gap:15px; }
-.post { background:#222; padding:15px; border-radius:10px; display:flex; flex-direction:column; gap:10px; transform: translateY(-20px); opacity:0; animation:slideFadeIn 0.5s forwards; }
-.post-header { display:flex; align-items:center; gap:10px; }
-.post-header img { width:40px; height:40px; border-radius:50%; border:1px solid gold; }
-.post-body img { max-width:100%; border-radius:10px; transition: transform 0.3s; }
-.post-body img:hover { transform: scale(1.05); }
-.post-actions { display:flex; gap:10px; align-items:center; }
-.post-comments { margin-top:10px; padding-left:50px; display:flex; flex-direction:column; gap:5px; }
-.comment { background:#333; padding:5px 10px; border-radius:5px; opacity:0; animation:fadeIn 0.5s forwards; display:flex; align-items:center; gap:5px; }
-#nuevo-post { max-width:800px; margin:20px auto; display:flex; flex-direction:column; gap:10px; }
-#nuevo-post textarea { width:100%; padding:10px; border-radius:5px; border:none; resize:none; }
-#nuevo-post select, #nuevo-post button, #nuevo-post input[type=file] { padding:10px; border-radius:5px; border:none; font-weight:bold; cursor:pointer; }
+/* ===== RESET & BODY ===== */
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI', sans-serif; background:#0d0d0d; color:#fff; }
+
+/* ===== BARRA SUPERIOR ===== */
+#barra-superior {
+  display:flex; align-items:center; gap:10px; background:#1a1a1a; padding:10px; flex-wrap:wrap; border-bottom:2px solid gold;
+}
+#barra-superior img { width:40px; height:40px; border-radius:50%; border:2px solid gold; }
+#barra-superior input { flex:1; padding:5px 10px; border-radius:10px; border:none; background:#222; color:#fff; }
+#barra-superior button { padding:5px 10px; border-radius:10px; border:none; background:gold; color:black; font-weight:bold; cursor:pointer; transition:0.2s; }
+#barra-superior button:hover { transform:scale(1.05); }
+
+/* ===== LOGO DEBAJO DEL BUSCADOR ===== */
+#logo-abajo { display:block; margin:10px auto; width:80px; height:80px; }
+
+/* ===== NUEVO POST ===== */
+#nuevo-post {
+  max-width:800px; margin:20px auto; display:flex; flex-direction:column; gap:10px; background:#1a1a1a; padding:15px; border-radius:15px; border:2px solid gold;
+}
+#nuevo-post textarea { width:100%; padding:10px; border-radius:10px; border:none; background:#222; color:#fff; resize:none; }
+#nuevo-post select, #nuevo-post input[type=file], #nuevo-post button { padding:10px; border-radius:10px; border:none; font-weight:bold; cursor:pointer; }
 #nuevo-post select, #nuevo-post input[type=file] { background:#222; color:#fff; }
 #nuevo-post button { width:150px; background:gold; color:black; align-self:flex-end; transition: transform 0.2s; }
 #nuevo-post button:hover { transform: scale(1.05); }
+#nuevo-post button:active { transform:scale(0.95); box-shadow:0 0 10px gold inset; }
 #preview { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-#preview img { max-width:100px; border-radius:10px; border:1px solid gold; }
-#chat-flotante { position:fixed; bottom:10px; right:10px; width:300px; background:#222; border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:5px; max-height:400px; overflow-y:auto; }
-#chat-mensajes { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:5px; }
-.chat-msg { display:flex; gap:5px; align-items:flex-end; max-width:80%; }
-.chat-msg img { width:25px; height:25px; border-radius:50%; }
+#preview img { max-width:100px; border-radius:10px; border:2px solid gold; transition: transform 0.3s, box-shadow 0.3s; }
+#preview img:hover { transform:scale(1.15); box-shadow:0 0 15px gold; }
+
+/* ===== FEED ===== */
+#feed { max-width:800px; margin:20px auto; display:flex; flex-direction:column; gap:20px; }
+.post {
+  background:#1a1a1a; padding:15px; border-radius:15px; border:2px solid gold; display:flex; flex-direction:column; gap:10px; 
+  opacity:0; transform:translateY(-20px); animation:slideFadeIn 0.5s forwards; 
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.post:hover { transform:translateY(-5px) scale(1.02); box-shadow:0 0 20px gold; }
+.post-header { display:flex; align-items:center; gap:10px; }
+.post-header img { width:45px; height:45px; border-radius:50%; border:2px solid gold; }
+.post-body p { margin:10px 0; }
+.post-body img { max-width:100%; border-radius:15px; transition: transform 0.3s; }
+.post-body img:hover { transform:scale(1.05); }
+.post-actions { display:flex; gap:15px; align-items:center; flex-wrap:wrap; }
+.post-actions span, .post-actions button { cursor:pointer; transition:0.2s; }
+.post-actions span:hover, .post-actions button:hover { transform:scale(1.1); }
+.post-actions span:active, .post-actions button:active { transform:scale(0.95); box-shadow:0 0 10px gold inset; }
+.post-comments { margin-top:10px; padding-left:50px; display:flex; flex-direction:column; gap:5px; }
+.comment {
+  background:linear-gradient(145deg, #222, #333); padding:5px 10px; border-radius:10px; display:flex; align-items:center; gap:5px; 
+  opacity:0; animation:fadeIn 0.5s forwards; transition: background 0.3s, transform 0.2s;
+}
+.comment:hover { background:linear-gradient(145deg, #333, #444); transform:scale(1.02); }
+.comment img { width:25px; height:25px; border-radius:50%; border:1px solid gold; }
+
+/* ===== POST BRILLO AL PUBLICAR ===== */
+.post.nuevo { animation:brilloPost 1s forwards; }
+@keyframes brilloPost {
+  0% { box-shadow: 0 0 0 gold; }
+  50% { box-shadow: 0 0 20px gold, 0 0 40px gold; }
+  100% { box-shadow: 0 0 0 gold; }
+}
+
+/* ===== CHAT FLOTANTE ===== */
+#chat-flotante {
+  position:fixed; bottom:10px; right:10px; width:320px; background:#1a1a1a; border-radius:15px; padding:10px; display:flex; flex-direction:column; gap:5px; max-height:450px; overflow-y:auto; border:2px solid gold;
+}
+#chat-mensajes { flex:1; display:flex; flex-direction:column; gap:5px; overflow-y:auto; }
+.chat-msg { display:flex; gap:5px; align-items:flex-end; max-width:80%; transition:0.5s; }
+.chat-msg img { width:30px; height:30px; border-radius:50%; border:1px solid gold; }
 .chat-msg.mine { align-self:flex-end; flex-direction:row-reverse; }
-#chat-flotante input { width:100%; padding:5px; border-radius:5px; border:none; }
-#chat-flotante button { padding:5px 10px; border:none; border-radius:5px; background:gold; color:black; font-weight:bold; cursor:pointer; }
+.chat-msg.sent-glow { box-shadow:0 0 20px gold; border-radius:10px; transition: box-shadow 0.5s; }
+#chat-flotante input { width:100%; padding:5px; border-radius:10px; border:none; background:#222; color:#fff; }
+#chat-flotante button { padding:5px 10px; border:none; border-radius:10px; background:gold; color:black; font-weight:bold; cursor:pointer; margin-top:5px; }
+#chat-flotante button:hover { transform:scale(1.05); }
+
+/* ===== POPUPS ===== */
 #popups { position:fixed; top:10px; right:10px; display:flex; flex-direction:column-reverse; gap:10px; z-index:9999; }
 .popup { background:gold; color:#000; padding:10px; border-radius:10px; display:flex; align-items:center; gap:8px; opacity:0; animation:fadeInOut 2.5s forwards; }
-@keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+
+/* ===== MODAL REGLAS ===== */
+.modal { display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; backdrop-filter:blur(3px); background-color:rgba(0,0,0,0.7); }
+.modal-content {
+  background:#1a1a1a; border:2px solid gold; margin:10% auto; padding:20px; border-radius:15px; width:90%; max-width:500px;
+  color:#fff; position:relative; animation:fadeIn 0.4s ease-in-out;
+}
+.modal-content h2 { margin-bottom:15px; color:gold; }
+.modal-content ul { list-style:disc inside; line-height:1.5; }
+.modal-content ul li { margin-bottom:8px; }
+.close-modal { position:absolute; top:10px; right:15px; font-size:24px; cursor:pointer; color:gold; transition:transform 0.2s; }
+.close-modal:hover { transform:scale(1.2); }
+
+/* ===== ANIMACIONES ===== */
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
 @keyframes fadeInOut { 0%{opacity:0;} 10%{opacity:1;} 90%{opacity:1;} 100%{opacity:0;} }
-@keyframes slideFadeIn { 0% {opacity:0; transform:translateY(-20px);} 100% {opacity:1; transform:translateY(0);} }
-.like-anim { animation:likePulse 0.3s; }
+@keyframes slideFadeIn { 0%{opacity:0; transform:translateY(-20px);} 100%{opacity:1; transform:translateY(0);} }
+.like-anim { animation:likePulse 0.3s forwards, likeGlow 0.5s forwards; }
 @keyframes likePulse { 0%{transform:scale(1);} 50%{transform:scale(1.3);} 100%{transform:scale(1);} }
+@keyframes likeGlow { 0% { text-shadow: 0 0 0 gold; } 50% { text-shadow: 0 0 10px gold,0 0 20px gold; } 100% { text-shadow:0 0 0 gold; } }
 </style>
 </head>
 <body>
 
+<!-- BARRA SUPERIOR -->
 <div id="barra-superior">
-  <img id="avatar-barra" src="" alt="Avatar">
+  <img id="avatar-barra" src="img/logo.png" alt="Avatar">
   <span id="usuarioActivo"></span>
   <button id="btnLogout">Cerrar Sesión</button>
   <button id="btnAlbum" onclick="location.href='album.html'">🏆 Volver al Álbum</button>
   <input type="text" id="search" placeholder="Buscar posts o usuarios...">
+  <button id="btnReglas">📜 Reglas</button>
 </div>
 
+<!-- LOGO DEBAJO DEL BUSCADOR -->
+<img id="logo-abajo" src="img/logo.png" alt="Logo LCDM">
+
+<!-- MODAL REGLAS -->
+<div id="modalReglas" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>📜 Reglas del Muro</h2>
+    <ul>
+      <li>No publicar contenido ofensivo o violento.</li>
+      <li>Respetar a los demás usuarios.</li>
+      <li>Los posts deben ser apropiados para todos.</li>
+      <li>No spamear ni publicar publicidad sin permiso.</li>
+      <li>Usar figuritas e imágenes de manera responsable.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- NUEVO POST -->
 <div id="nuevo-post">
   <textarea id="postTexto" placeholder="Escribe tu post..."></textarea>
-  <select id="postFigurita">
-    <option value="">Selecciona figurita</option>
-  </select>
+  <select id="postFigurita"></select>
   <input type="file" id="postImagen" accept="image/*">
   <div id="preview"></div>
   <button id="btnCrearPost">Publicar</button>
 </div>
 
+<!-- FEED -->
 <div id="feed"></div>
 
+<!-- CHAT FLOTANTE -->
 <div id="chat-flotante">
   <div id="chat-mensajes"></div>
   <input type="text" id="chat-input" placeholder="Escribir mensaje...">
   <button id="btnEnviarChat">Enviar</button>
 </div>
 
+<!-- POPUPS -->
 <div id="popups"></div>
 
 <script>
 // ---------------- USUARIO ----------------
-let usuario = JSON.parse(localStorage.getItem('usuario')) || {nombre:'Cofundador', avatar:'https://i.ibb.co/781Qj0J/logo.png', figuritas:['A','B','C']};
-const usuarioActivo = document.getElementById('usuarioActivo');
-const avatarBarra = document.getElementById('avatar-barra');
-usuarioActivo.textContent = usuario.nombre;
-avatarBarra.src = usuario.avatar;
+let usuario = JSON.parse(localStorage.getItem('usuario')) || {nombre:'Cofundador', avatar:'img/logo.png', figuritas:['A','B','C']};
+document.getElementById('usuarioActivo').textContent = usuario.nombre;
+document.getElementById('avatar-barra').src = usuario.avatar;
 
 // ---------------- POPUPS ----------------
 function showPopup(msg, avatar=''){
   const popups = document.getElementById('popups');
-  const div = document.createElement('div');
-  div.className = 'popup';
-  div.innerHTML = avatar ? `<img src="${avatar}" style="width:30px;height:30px;border-radius:50%;vertical-align:middle;"> ${msg}` : msg;
-  popups.prepend(div); 
-  setTimeout(()=>{ div.remove(); }, 2500);
+  const div = document.createElement('div'); div.className = 'popup';
+  div.innerHTML = avatar ? `<img src="${avatar}"> ${msg}` : msg;
+  popups.prepend(div); setTimeout(()=> div.remove(), 2500);
 }
 
 // ---------------- FIGURITAS ----------------
 const selectFigurita = document.getElementById('postFigurita');
 function cargarFiguritas(){
   selectFigurita.innerHTML='<option value="">Selecciona figurita</option>';
-  usuario.figuritas.forEach(f=>{
-    const opt = document.createElement('option');
-    opt.value=f;
-    opt.textContent=f;
-    selectFigurita.appendChild(opt);
-  });
+  usuario.figuritas.forEach(f=>{ const opt = document.createElement('option'); opt.value=f; opt.textContent=f; selectFigurita.appendChild(opt); });
 }
 cargarFiguritas();
 
 // ---------------- PREVIEW ----------------
-const postImagen = document.getElementById('postImagen');
-const preview = document.getElementById('preview');
+const postImagen = document.getElementById('postImagen'); const preview = document.getElementById('preview');
 selectFigurita.addEventListener('change', updatePreview);
 postImagen.addEventListener('change', updatePreview);
-
 function updatePreview(){
   preview.innerHTML='';
-  if(selectFigurita.value){
-    const img = document.createElement('img');
-    img.src = `https://i.ibb.co/781Qj0J/${selectFigurita.value}.png`;
-    preview.appendChild(img);
-  }
-  if(postImagen.files[0]){
-    const reader = new FileReader();
-    reader.onload = ()=>{ 
-      const img = document.createElement('img'); 
-      img.src = reader.result; 
-      preview.appendChild(img); 
-    };
-    reader.readAsDataURL(postImagen.files[0]);
-  }
+  if(selectFigurita.value){ const img = document.createElement('img'); img.src=`https://i.ibb.co/781Qj0J/${selectFigurita.value}.png`; preview.appendChild(img); }
+  if(postImagen.files[0]){ const reader = new FileReader(); reader.onload = ()=>{ const img=document.createElement('img'); img.src=reader.result; preview.appendChild(img); }; reader.readAsDataURL(postImagen.files[0]); }
 }
 
 // ---------------- POSTS ----------------
 function cargarPosts(filter=''){
-  const feed = document.getElementById('feed');
-  feed.innerHTML='';
-  let posts=[];
-  for(let i=0;i<localStorage.length;i++){
-    const key=localStorage.key(i);
-    if(key.startsWith('post_')){
-      const post=JSON.parse(localStorage.getItem(key));
-      post._key=key;
-      if(filter){
-        if(!post.texto.toLowerCase().includes(filter.toLowerCase()) && !post.usuario.toLowerCase().includes(filter.toLowerCase())) continue;
-      }
-      posts.push(post);
-    }
-  }
+  const feed = document.getElementById('feed'); feed.innerHTML=''; let posts=[];
+  for(let i=0;i<localStorage.length;i++){ const key=localStorage.key(i); if(key.startsWith('post_')){ const post=JSON.parse(localStorage.getItem(key)); post._key=key;
+  if(filter){ if(!post.texto.toLowerCase().includes(filter.toLowerCase()) && !post.usuario.toLowerCase().includes(filter.toLowerCase())) continue; } posts.push(post); }}
   posts.sort((a,b)=> b._key.localeCompare(a._key));
-  posts.forEach(post=>{
-    const div=document.createElement('div');
-    div.className='post';
+  posts.forEach(post=>{ const div=document.createElement('div'); div.className='post';
     div.innerHTML=`
       <div class="post-header">
         <img src="${post.avatar}" alt="Avatar">
@@ -164,133 +214,82 @@ function cargarPosts(filter=''){
       </div>
       <div class="post-comments" id="comments-${post._key}"></div>
     `;
-    feed.appendChild(div);
-    mostrarComentarios(post._key);
+    feed.appendChild(div); mostrarComentarios(post._key);
   });
 }
 
 // ---------------- CREAR POST ----------------
-document.getElementById('btnCrearPost').addEventListener('click',()=>{
+document.getElementById('btnCrearPost').addEventListener('click', ()=>{
   const texto=document.getElementById('postTexto').value;
   const figurita=selectFigurita.value;
   if(!texto && !figurita && !postImagen.files[0]){ showPopup('Agrega texto, figurita o imagen', usuario.avatar); return; }
-  
-  if(postImagen.files[0]){
-    const reader=new FileReader();
-    reader.onload=()=> guardarPost(texto, figurita, reader.result);
-    reader.readAsDataURL(postImagen.files[0]);
-  } else {
-    guardarPost(texto, figurita, '');
-  }
+  if(postImagen.files[0]){ const reader=new FileReader(); reader.onload=()=> guardarPost(texto, figurita, reader.result); reader.readAsDataURL(postImagen.files[0]); }
+  else { guardarPost(texto, figurita, ''); }
 });
-
 function guardarPost(texto, figurita, imagen){
   const id='post_'+Date.now();
   const post={usuario:usuario.nombre, avatar:usuario.avatar, texto:texto, figurita:figurita, imagen:imagen, likes:0, usersLiked:[], comentarios:[]};
   localStorage.setItem(id,JSON.stringify(post));
-  document.getElementById('postTexto').value='';
-  postImagen.value='';
-  selectFigurita.value='';
-  preview.innerHTML='';
-  cargarPosts(document.getElementById('search').value);
+  document.getElementById('postTexto').value=''; postImagen.value=''; selectFigurita.value=''; preview.innerHTML='';
+  cargarPosts(document.getElementById('search').value); 
   showPopup('Post publicado! 🔥', usuario.avatar);
+  const feed = document.getElementById('feed');
+  const nuevoPostDiv = feed.firstChild;
+  if(nuevoPostDiv) nuevoPostDiv.classList.add('nuevo'); // brillo dorado
 }
 
 // ---------------- LIKE ----------------
-document.addEventListener('click',e=>{
+document.addEventListener('click', e=>{
   if(e.target.classList.contains('likeBtn') || e.target.parentElement.classList.contains('likeBtn')){
     const key=e.target.dataset.key || e.target.parentElement.dataset.key;
     const post=JSON.parse(localStorage.getItem(key));
     if(!post.usersLiked) post.usersLiked=[];
     if(!post.usersLiked.includes(usuario.nombre)){
-      post.likes=(post.likes||0)+1;
-      post.usersLiked.push(usuario.nombre);
-      localStorage.setItem(key,JSON.stringify(post));
-      showPopup(`👍 Diste like a ${post.usuario}`, usuario.avatar);
-      const span = document.getElementById('like-'+key);
-      span.textContent=post.likes;
-      span.classList.add('like-anim');
-      setTimeout(()=>span.classList.remove('like-anim'),300);
-    } else showPopup(`Ya le diste like a ${post.usuario}`, usuario.avatar);
+      post.likes=(post.likes||0)+1; post.usersLiked.push(usuario.nombre); localStorage.setItem(key,JSON.stringify(post));
+      const span=document.getElementById('like-'+key); span.textContent=post.likes; span.classList.add('like-anim'); setTimeout(()=>span.classList.remove('like-anim'),300);
+    }
   }
 });
 
 // ---------------- COMENTARIOS ----------------
-function comentar(key){
-  const texto=prompt('Escribí tu comentario:');
-  if(texto){
-    const post=JSON.parse(localStorage.getItem(key));
-    post.comentarios.push({usuario:usuario.nombre, texto:texto, avatar:usuario.avatar});
-    localStorage.setItem(key,JSON.stringify(post));
-    mostrarComentarios(key);
-    showPopup(`${usuario.nombre} comentó en ${post.usuario}`, usuario.avatar);
-  }
-}
-
-function mostrarComentarios(key){
-  const post=JSON.parse(localStorage.getItem(key));
-  const commentsDiv=document.getElementById('comments-'+key);
-  commentsDiv.innerHTML='';
-  post.comentarios.forEach(c=>{
-    const div=document.createElement('div');
-    div.className='comment';
-    div.innerHTML=`<img src="${c.avatar}" style="width:20px;height:20px;border-radius:50%;vertical-align:middle;margin-right:5px;"> <strong>${c.usuario}:</strong> ${c.texto}`;
-    commentsDiv.appendChild(div);
-  });
-}
+function comentar(key){ const texto=prompt('Escribí tu comentario:'); if(texto){ const post=JSON.parse(localStorage.getItem(key)); post.comentarios.push({usuario:usuario.nombre, texto:texto, avatar:usuario.avatar}); localStorage.setItem(key,JSON.stringify(post)); mostrarComentarios(key); } }
+function mostrarComentarios(key){ const post=JSON.parse(localStorage.getItem(key)); const commentsDiv=document.getElementById('comments-'+key); commentsDiv.innerHTML=''; post.comentarios.forEach(c=>{ const div=document.createElement('div'); div.className='comment'; div.innerHTML=`<img src="${c.avatar}"> <strong>${c.usuario}:</strong> ${c.texto}`; commentsDiv.appendChild(div); }); }
 
 // ---------------- INTERCAMBIAR FIGURITA ----------------
 function intercambiar(key){ showPopup('Función de intercambio activada', usuario.avatar); }
 
 // ---------------- CHAT ----------------
-const chatInput=document.getElementById('chat-input');
-const chatMensajes=document.getElementById('chat-mensajes');
-document.getElementById('btnEnviarChat').addEventListener('click',()=>{
-  const msg = chatInput.value.trim();
-  if(!msg) return;
+const chatInput=document.getElementById('chat-input'); const chatMensajes=document.getElementById('chat-mensajes');
+document.getElementById('btnEnviarChat').addEventListener('click', ()=>{
+  const msg=chatInput.value.trim(); if(!msg) return;
   const id='chat_'+Date.now();
   const chatMsg={usuario:usuario.nombre,texto:msg,avatar:usuario.avatar,id:Date.now()};
   localStorage.setItem(id,JSON.stringify(chatMsg));
-  chatInput.value='';
-  cargarChat();
-  showPopup(`${usuario.nombre}: ${msg}`, usuario.avatar);
+  chatInput.value=''; cargarChat();
+  const ultimoMsg = chatMensajes.lastChild;
+  if(ultimoMsg){ ultimoMsg.classList.add('sent-glow'); setTimeout(()=> ultimoMsg.classList.remove('sent-glow'),500); }
 });
-
-function cargarChat(){
-  chatMensajes.innerHTML='';
-  let chats = [];
-  for(let i=0;i<localStorage.length;i++){
-    const key=localStorage.key(i);
-    if(key.startsWith('chat_')){
-      chats.push(JSON.parse(localStorage.getItem(key)));
-    }
-  }
-  chats.sort((a,b)=> a.id - b.id); 
-  chats.forEach(msg=>{
-    const div=document.createElement('div');
-    div.className='chat-msg'+(msg.usuario===usuario.nombre?' mine':'');
-    div.innerHTML=`<img src="${msg.avatar}"> <span>${msg.texto}</span>`;
-    chatMensajes.appendChild(div);
-  });
-  chatMensajes.scrollTop = chatMensajes.scrollHeight;
-}
+function cargarChat(){ chatMensajes.innerHTML=''; let chats=[]; for(let i=0;i<localStorage.length;i++){ const key=localStorage.key(i); if(key.startsWith('chat_')) chats.push(JSON.parse(localStorage.getItem(key))); } chats.sort((a,b)=> a.id - b.id); chats.forEach(msg=>{ const div=document.createElement('div'); div.className='chat-msg'+(msg.usuario===usuario.nombre?' mine':''); div.innerHTML=`<img src="${msg.avatar}"> <span>${msg.texto}</span>`; chatMensajes.appendChild(div); }); chatMensajes.scrollTop=chatMensajes.scrollHeight; }
 
 // ---------------- LOGOUT ----------------
 document.getElementById('btnLogout').addEventListener('click',()=>{ localStorage.removeItem('usuario'); location.href='album.html'; });
 
 // ---------------- BUSCADOR ----------------
-document.getElementById('search').addEventListener('input',e=>{ cargarPosts(e.target.value); });
+document.getElementById('search').addEventListener('input', e=>{ cargarPosts(e.target.value); });
+
+// ---------------- MODAL REGLAS ----------------
+const modalReglas = document.getElementById('modalReglas');
+const btnReglas = document.getElementById('btnReglas');
+const closeModal = document.querySelector('.close-modal');
+btnReglas.addEventListener('click', ()=> modalReglas.style.display='block');
+closeModal.addEventListener('click', ()=> modalReglas.style.display='none');
+window.addEventListener('click', e=> { if(e.target==modalReglas) modalReglas.style.display='none'; });
 
 // ---------------- AUTO REFRESH ----------------
-setInterval(()=>{
-  cargarPosts(document.getElementById('search').value);
-  cargarChat();
-},2000);
+setInterval(()=>{ cargarPosts(document.getElementById('search').value); cargarChat(); },2000);
 
 // ---------------- INICIALIZAR ----------------
-cargarFiguritas();
-cargarPosts();
-cargarChat();
+cargarFiguritas(); cargarPosts(); cargarChat();
 </script>
 </body>
 </html>

@@ -58,21 +58,46 @@
         onclick="location.href='muro.html'">
   ✨ Global ✨
 </button>
-    <button id="btnAyuda">Ayuda</button>
-    <div id="tooltipAyuda">
-      <div class="tooltipFlecha"></div>
-      <div class="tooltipContenido">
-        <h3>Ayuda / Reglas</h3>
-        <p>
-          1. Puedes coleccionar hasta 5 figuritas por día.<br>
-          2. Haz clic en cada figurita para ver su contenido.<br>
-          3. ¡Disfruta del álbum y comparte con tus amigos!<br>
-          4. Continúa agregando más reglas si lo deseas.<br>
-          5. Personaliza todo el contenido.<br>
-          6. Agrega imágenes si quieres.
-        </p>
-      </div>
-    </div>
+	      <button id="btnMio" 
+        style="color:#00ffff; background:linear-gradient(45deg, #ff0, #f0f); border:none; border-radius:10px; padding:5px 10px; cursor:pointer; font-weight:bold;"
+        onclick="location.href='muro.html'">
+  juego
+</button>
+<!-- Botón Ayuda actualizado -->
+<button id="btnAyuda" 
+    style="color:#00ffff; background:linear-gradient(45deg, #ff0, #f0f); border:none; border-radius:10px; padding:5px 10px; cursor:pointer; font-weight:bold;">
+  ❓ Ayuda
+</button>
+
+<!-- Modal de ayuda / reglas -->
+<div id="modalAyuda" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  background:#111; color:#fff; padding:2rem; border-radius:15px; z-index:10002; max-width:500px; text-align:center; box-shadow:0 0 15px gold;">
+  <h2 style="color:gold; margin-bottom:1rem;">📖 Reglas del Juego</h2>
+  <p style="text-align:left; line-height:1.5rem;">
+    1. Puedes coleccionar hasta 5 figuritas por día.<br>
+    2. Haz clic en cada figurita para ver su contenido.<br>
+    3. ¡Disfruta del álbum y comparte con tus amigos!<br>
+    4. Continúa agregando más reglas si lo deseas.<br>
+    5. Personaliza todo el contenido.<br>
+    6. Agrega imágenes si quieres.
+  </p>
+  <button id="cerrarModalAyuda" style="margin-top:1rem; padding:0.5rem 1rem; font-size:1rem; cursor:pointer; border:none; border-radius:5px; background:gold; color:black; font-weight:bold;">
+    Cerrar
+  </button>
+</div>
+
+<script>
+// Abrir modal de ayuda
+document.getElementById('btnAyuda').addEventListener('click', () => {
+  document.getElementById('modalAyuda').style.display = 'block';
+});
+
+// Cerrar modal de ayuda
+document.getElementById('cerrarModalAyuda').addEventListener('click', () => {
+  document.getElementById('modalAyuda').style.display = 'none';
+});
+</script>
+
   </div>
   <button id="btnReiniciar">&#127873; Canjear Premio</button>
   <button id="btnLogout">Cerrar Sesión</button>
