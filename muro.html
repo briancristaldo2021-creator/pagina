@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Muro Público - LCDM</title>
+<title>Muro Público - LCDM (Servidor JSON + Polling)</title>
 <style>
 /* ===== RESET & BODY ===== */
 * { box-sizing:border-box; margin:0; padding:0; }
@@ -45,7 +45,7 @@ body { font-family:'Segoe UI', sans-serif; background:#0d0d0d; color:#fff; }
 .post:hover { transform:translateY(-5px) scale(1.02); box-shadow:0 0 20px gold; }
 .post-header { display:flex; align-items:center; gap:10px; }
 .post-header img { width:45px; height:45px; border-radius:50%; border:2px solid gold; }
-.post-body p { margin:10px 0; }
+.post-body p { margin:10px 0; word-wrap:break-word; }
 .post-body img { max-width:100%; border-radius:15px; transition: transform 0.3s; }
 .post-body img:hover { transform:scale(1.05); }
 .post-actions { display:flex; gap:15px; align-items:center; flex-wrap:wrap; }
@@ -159,6 +159,16 @@ body { font-family:'Segoe UI', sans-serif; background:#0d0d0d; color:#fff; }
 <div id="popups"></div>
 
 <script>
+/*
+  Versión cliente: comunica con guardar.php (misma carpeta).
+  Requiere en el servidor:
+   - guardar.php (proporcionado más abajo)
+   - datos.json (inicial: {"posts":[],"chats":[]} ) con permisos de escritura
+*/
+
+// URL del script PHP (mismo directorio)
+const API = 'guardar.php';
+
 // ---------------- USUARIO ----------------
 let usuario = JSON.parse(localStorage.getItem('usuario')) || {nombre:'Cofundador', avatar:'img/logo.png', figuritas:['A','B','C']};
 document.getElementById('usuarioActivo').textContent = usuario.nombre;
@@ -168,7 +178,7 @@ document.getElementById('avatar-barra').src = usuario.avatar;
 function showPopup(msg, avatar=''){
   const popups = document.getElementById('popups');
   const div = document.createElement('div'); div.className = 'popup';
-  div.innerHTML = avatar ? `<img src="${avatar}"> ${msg}` : msg;
+  div.innerHTML = avatar ? `<img src="${avatar}" style="width:30px;height:30px;border-radius:50%;margin-right:6px">${msg}` : msg;
   popups.prepend(div); setTimeout(()=> div.remove(), 2500);
 }
 
@@ -190,86 +200,173 @@ function updatePreview(){
   if(postImagen.files[0]){ const reader = new FileReader(); reader.onload = ()=>{ const img=document.createElement('img'); img.src=reader.result; preview.appendChild(img); }; reader.readAsDataURL(postImagen.files[0]); }
 }
 
-// ---------------- POSTS ----------------
-function cargarPosts(filter=''){
-  const feed = document.getElementById('feed'); feed.innerHTML=''; let posts=[];
-  for(let i=0;i<localStorage.length;i++){ const key=localStorage.key(i); if(key.startsWith('post_')){ const post=JSON.parse(localStorage.getItem(key)); post._key=key;
-  if(filter){ if(!post.texto.toLowerCase().includes(filter.toLowerCase()) && !post.usuario.toLowerCase().includes(filter.toLowerCase())) continue; } posts.push(post); }}
-  posts.sort((a,b)=> b._key.localeCompare(a._key));
-  posts.forEach(post=>{ const div=document.createElement('div'); div.className='post';
-    div.innerHTML=`
-      <div class="post-header">
-        <img src="${post.avatar}" alt="Avatar">
-        <strong>${post.usuario}</strong>
-      </div>
-      <div class="post-body">
-        <p>${post.texto}</p>
-        ${post.figurita?`<img src="https://i.ibb.co/781Qj0J/${post.figurita}.png" alt="${post.figurita}">`:''}
-        ${post.imagen?`<img src="${post.imagen}" alt="Imagen">`:''}
-      </div>
-      <div class="post-actions">
-        <span class="likeBtn" data-key="${post._key}">❤️ <span id="like-${post._key}">${post.likes||0}</span></span>
-        <button onclick="comentar('${post._key}')">💬 Comentar</button>
-        <button onclick="intercambiar('${post._key}')">🔄 Intercambiar figurita</button>
-      </div>
-      <div class="post-comments" id="comments-${post._key}"></div>
-    `;
-    feed.appendChild(div); mostrarComentarios(post._key);
-  });
+// ---------------- POSTS (Servidor) ----------------
+async function cargarPosts(filter=''){
+  try{
+    const res = await fetch(API);
+    const data = await res.json();
+    const posts = data.posts || [];
+    const feed = document.getElementById('feed'); feed.innerHTML='';
+    // orden descendente por fecha (timestamp)
+    posts.sort((a,b)=> b.fecha - a.fecha);
+    posts.forEach(post=>{
+      if(filter){
+        if(!(post.texto && post.texto.toLowerCase().includes(filter.toLowerCase())) &&
+           !(post.usuario && post.usuario.toLowerCase().includes(filter.toLowerCase()))) return;
+      }
+      const div=document.createElement('div'); div.className='post';
+      div.innerHTML=`
+        <div class="post-header">
+          <img src="${post.avatar}" alt="Avatar">
+          <strong>${post.usuario}</strong>
+          <small style="margin-left:10px;color:#ccc">${new Date(post.fecha).toLocaleString()}</small>
+        </div>
+        <div class="post-body">
+          <p>${post.texto || ''}</p>
+          ${post.figurita?`<img src="https://i.ibb.co/781Qj0J/${post.figurita}.png" alt="${post.figurita}">`:''}
+          ${post.imagen?`<img src="${post.imagen}" alt="Imagen">`:''}
+        </div>
+        <div class="post-actions">
+          <span class="likeBtn" data-id="${post.id}">❤️ <span id="like-${post.id}">${post.likes||0}</span></span>
+          <button class="btn-comentar" data-id="${post.id}">💬 Comentar</button>
+          <button class="btn-intercambiar" data-id="${post.id}">🔄 Intercambiar figurita</button>
+        </div>
+        <div class="post-comments" id="comments-${post.id}"></div>
+      `;
+      feed.appendChild(div);
+      mostrarComentarios(post);
+    });
+  }catch(err){
+    console.error('Error cargando posts:', err);
+  }
 }
 
-// ---------------- CREAR POST ----------------
-document.getElementById('btnCrearPost').addEventListener('click', ()=>{
-  const texto=document.getElementById('postTexto').value;
+// ---------------- CREAR POST (envía al servidor) ----------------
+document.getElementById('btnCrearPost').addEventListener('click', async ()=>{
+  const texto=document.getElementById('postTexto').value.trim();
   const figurita=selectFigurita.value;
   if(!texto && !figurita && !postImagen.files[0]){ showPopup('Agrega texto, figurita o imagen', usuario.avatar); return; }
   if(postImagen.files[0]){ const reader=new FileReader(); reader.onload=()=> guardarPost(texto, figurita, reader.result); reader.readAsDataURL(postImagen.files[0]); }
   else { guardarPost(texto, figurita, ''); }
 });
-function guardarPost(texto, figurita, imagen){
-  const id='post_'+Date.now();
-  const post={usuario:usuario.nombre, avatar:usuario.avatar, texto:texto, figurita:figurita, imagen:imagen, likes:0, usersLiked:[], comentarios:[]};
-  localStorage.setItem(id,JSON.stringify(post));
-  document.getElementById('postTexto').value=''; postImagen.value=''; selectFigurita.value=''; preview.innerHTML='';
-  cargarPosts(document.getElementById('search').value); 
-  showPopup('Post publicado! 🔥', usuario.avatar);
-  const feed = document.getElementById('feed');
-  const nuevoPostDiv = feed.firstChild;
-  if(nuevoPostDiv) nuevoPostDiv.classList.add('nuevo'); // brillo dorado
+
+async function guardarPost(texto, figurita, imagen){
+  const post = {
+    id: 'post_'+Date.now(),
+    usuario: usuario.nombre,
+    avatar: usuario.avatar,
+    texto: texto,
+    figurita: figurita,
+    imagen: imagen || '',
+    likes: 0,
+    usersLiked: [],
+    comentarios: [],
+    fecha: Date.now()
+  };
+
+  const formData = new FormData();
+  formData.append('action', 'post');
+  formData.append('post', JSON.stringify(post));
+
+  try{
+    await fetch(API, { method: 'POST', body: formData });
+    document.getElementById('postTexto').value=''; postImagen.value=''; selectFigurita.value=''; preview.innerHTML='';
+    cargarPosts(document.getElementById('search').value);
+    showPopup('Post publicado! 🔥', usuario.avatar);
+    // resaltar el primer post al publicarlo (será el más reciente después de recarga)
+    setTimeout(()=>{ const first = document.querySelector('#feed .post'); if(first) first.classList.add('nuevo'); setTimeout(()=> first && first.classList.remove('nuevo'),1500); }, 300);
+  }catch(err){
+    console.error('Error publicando post:', err);
+    showPopup('Error al publicar (ver consola)', usuario.avatar);
+  }
 }
 
 // ---------------- LIKE ----------------
-document.addEventListener('click', e=>{
-  if(e.target.classList.contains('likeBtn') || e.target.parentElement.classList.contains('likeBtn')){
-    const key=e.target.dataset.key || e.target.parentElement.dataset.key;
-    const post=JSON.parse(localStorage.getItem(key));
-    if(!post.usersLiked) post.usersLiked=[];
-    if(!post.usersLiked.includes(usuario.nombre)){
-      post.likes=(post.likes||0)+1; post.usersLiked.push(usuario.nombre); localStorage.setItem(key,JSON.stringify(post));
-      const span=document.getElementById('like-'+key); span.textContent=post.likes; span.classList.add('like-anim'); setTimeout(()=>span.classList.remove('like-anim'),300);
+document.addEventListener('click', async (e)=>{
+  const likeBtn = e.target.closest('.likeBtn');
+  if(likeBtn){
+    const id = likeBtn.dataset.id;
+    try{
+      const fd = new FormData();
+      fd.append('action','like');
+      fd.append('id', id);
+      fd.append('usuario', usuario.nombre);
+      await fetch(API, { method:'POST', body:fd });
+      // refrescar contador
+      cargarPosts(document.getElementById('search').value);
+      const span = document.getElementById('like-'+id); if(span){ span.classList.add('like-anim'); setTimeout(()=>span.classList.remove('like-anim'),400); }
+    }catch(err){ console.error('Error like:', err); }
+  }
+
+  if(e.target.closest('.btn-comentar')){
+    const id = e.target.closest('.btn-comentar').dataset.id;
+    const texto = prompt('Escribí tu comentario:');
+    if(texto){
+      const comment = { usuario: usuario.nombre, texto: texto, avatar: usuario.avatar, fecha: Date.now() };
+      const fd = new FormData();
+      fd.append('action','comment');
+      fd.append('id', id);
+      fd.append('comment', JSON.stringify(comment));
+      try{
+        await fetch(API, { method:'POST', body:fd });
+        cargarPosts(document.getElementById('search').value);
+      }catch(err){ console.error('Error comentar:', err); }
     }
+  }
+
+  if(e.target.closest('.btn-intercambiar')){
+    showPopup('Función de intercambio activada', usuario.avatar);
   }
 });
 
-// ---------------- COMENTARIOS ----------------
-function comentar(key){ const texto=prompt('Escribí tu comentario:'); if(texto){ const post=JSON.parse(localStorage.getItem(key)); post.comentarios.push({usuario:usuario.nombre, texto:texto, avatar:usuario.avatar}); localStorage.setItem(key,JSON.stringify(post)); mostrarComentarios(key); } }
-function mostrarComentarios(key){ const post=JSON.parse(localStorage.getItem(key)); const commentsDiv=document.getElementById('comments-'+key); commentsDiv.innerHTML=''; post.comentarios.forEach(c=>{ const div=document.createElement('div'); div.className='comment'; div.innerHTML=`<img src="${c.avatar}"> <strong>${c.usuario}:</strong> ${c.texto}`; commentsDiv.appendChild(div); }); }
+// Mostrar comentarios en un post (usa el objeto post completo)
+function mostrarComentarios(post){
+  const commentsDiv = document.getElementById('comments-'+post.id);
+  if(!commentsDiv) return;
+  commentsDiv.innerHTML = '';
+  (post.comentarios || []).forEach(c=>{
+    const div = document.createElement('div'); div.className='comment';
+    div.innerHTML = `<img src="${c.avatar}"> <strong>${c.usuario}:</strong> ${c.texto}`;
+    commentsDiv.appendChild(div);
+  });
+}
 
-// ---------------- INTERCAMBIAR FIGURITA ----------------
-function intercambiar(key){ showPopup('Función de intercambio activada', usuario.avatar); }
+// ---------------- CHAT (Servidor) ----------------
+const chatInput = document.getElementById('chat-input');
+const chatMensajes = document.getElementById('chat-mensajes');
 
-// ---------------- CHAT ----------------
-const chatInput=document.getElementById('chat-input'); const chatMensajes=document.getElementById('chat-mensajes');
-document.getElementById('btnEnviarChat').addEventListener('click', ()=>{
-  const msg=chatInput.value.trim(); if(!msg) return;
-  const id='chat_'+Date.now();
-  const chatMsg={usuario:usuario.nombre,texto:msg,avatar:usuario.avatar,id:Date.now()};
-  localStorage.setItem(id,JSON.stringify(chatMsg));
-  chatInput.value=''; cargarChat();
-  const ultimoMsg = chatMensajes.lastChild;
-  if(ultimoMsg){ ultimoMsg.classList.add('sent-glow'); setTimeout(()=> ultimoMsg.classList.remove('sent-glow'),500); }
-});
-function cargarChat(){ chatMensajes.innerHTML=''; let chats=[]; for(let i=0;i<localStorage.length;i++){ const key=localStorage.key(i); if(key.startsWith('chat_')) chats.push(JSON.parse(localStorage.getItem(key))); } chats.sort((a,b)=> a.id - b.id); chats.forEach(msg=>{ const div=document.createElement('div'); div.className='chat-msg'+(msg.usuario===usuario.nombre?' mine':''); div.innerHTML=`<img src="${msg.avatar}"> <span>${msg.texto}</span>`; chatMensajes.appendChild(div); }); chatMensajes.scrollTop=chatMensajes.scrollHeight; }
+document.getElementById('btnEnviarChat').addEventListener('click', enviarChat);
+
+async function enviarChat(){
+  const msg = chatInput.value.trim(); if(!msg) return;
+  const chatMsg = { id: 'chat_'+Date.now(), usuario: usuario.nombre, avatar: usuario.avatar, texto: msg, fecha: Date.now() };
+  const fd = new FormData();
+  fd.append('action','chat');
+  fd.append('chat', JSON.stringify(chatMsg));
+  try{
+    await fetch(API, { method:'POST', body:fd });
+    chatInput.value=''; cargarChat();
+    // animación glow en el último mensaje
+    setTimeout(()=>{ const ultimo = chatMensajes.lastChild; if(ultimo) { ultimo.classList.add('sent-glow'); setTimeout(()=>ultimo.classList.remove('sent-glow'),600); } }, 200);
+  }catch(err){ console.error('Error enviando chat:', err); }
+}
+
+async function cargarChat(){
+  try{
+    const res = await fetch(API);
+    const data = await res.json();
+    const chats = data.chats || [];
+    chats.sort((a,b)=> a.fecha - b.fecha);
+    chatMensajes.innerHTML = '';
+    chats.forEach(msg=>{
+      const div = document.createElement('div');
+      div.className = 'chat-msg' + (msg.usuario === usuario.nombre ? ' mine' : '');
+      div.innerHTML = `<img src="${msg.avatar}"> <span>${msg.texto}</span>`;
+      chatMensajes.appendChild(div);
+    });
+    chatMensajes.scrollTop = chatMensajes.scrollHeight;
+  }catch(err){ console.error('Error cargando chat:', err); }
+}
 
 // ---------------- LOGOUT ----------------
 document.getElementById('btnLogout').addEventListener('click',()=>{ localStorage.removeItem('usuario'); location.href='album.html'; });

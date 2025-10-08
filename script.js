@@ -1,4 +1,4 @@
-const urlServidor = './guardar.php';
+const urlServidor = 'guardar.php';
 const chat = document.getElementById('chat');
 
 function actualizar() {
@@ -13,6 +13,25 @@ function actualizar() {
     });
 }
 
+// Actualizar cada 2 segundos
+setInterval(actualizar, 2000);
+
+function enviar() {
+    const mensaje = document.getElementById('mensaje').value;
+    if(!mensaje) return;
+
+    const formData = new FormData();
+    formData.append('mensaje', mensaje);
+
+    fetch(urlServidor, { method: 'POST', body: formData })
+        .then(() => {
+            document.getElementById('mensaje').value = '';
+            actualizar();
+        });
+}
+
+// Carga inicial
+actualizar();
 
 
 // Carga inicial
