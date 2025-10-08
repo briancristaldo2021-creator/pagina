@@ -1,3 +1,23 @@
+const urlServidor = './guardar.php';
+const chat = document.getElementById('chat');
+
+function actualizar() {
+    fetch(urlServidor)
+    .then(res => res.json())
+    .then(data => {
+        chat.innerHTML = "";
+        data.forEach(m => {
+            chat.innerHTML += `<p>[${m.fecha}] ${m.mensaje}</p>`;
+        });
+        chat.scrollTop = chat.scrollHeight;
+    });
+}
+
+
+
+// Carga inicial
+actualizar();
+
 // === Inicialización de usuario y album ===
 document.addEventListener("DOMContentLoaded", () => {
   const usuarioActivoKey = localStorage.getItem("usuarioActivo");
@@ -205,3 +225,5 @@ function mostrarCelebracionConPremio(){
 
 // === Confeti y fuegos ===
 // (Mismo código que tenías en script.js, sin cambios)
+// Carga inicial
+actualizar();

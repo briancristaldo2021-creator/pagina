@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LCDM</title>
+<style>
+html, body { margin:0; padding:0; height:100%; overflow:hidden; font-family: 'Courier New', monospace; background:black; }
+body { cursor: crosshair; }
+
+/* Fondo con parallax de niebla */
+#background { position: fixed; top:0; left:0; width:100%; height:100%; overflow:hidden; z-index:0; background:black; }
+.fog { position:absolute; width:200%; height:200%; background:url('https://i.imgur.com/8lJkD2K.png'); background-repeat:repeat; opacity:0.08; animation: moveFog 60s linear infinite, floatFog 120s linear infinite; }
+.fog:nth-child(2){ animation-duration:80s,150s; opacity:0.05; }
+.fog:nth-child(3){ animation-duration:100s,200s; opacity:0.03; }
+@keyframes moveFog { 0% { background-position:0 0; } 100% { background-position:-50% 0; } }
+@keyframes floatFog { 0% { background-position:0 0; } 50% { background-position:0 20%; } 100% { background-position:0 0; } }
+
+/* Partículas interactivas */
+#title-canvas { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+
+/* Contenedor título y botón */
+#title-container { position:absolute; top:25%; width:100%; text-align:center; pointer-events:none; opacity:1; transition:opacity 1.5s; z-index:10; }
+#title { font-family:'Courier New', monospace; font-size:4em; color:#ff0000; text-shadow: 0 0 20px #ff0000, 0 0 50px #ff5555, 0 0 100px #ff0000; opacity:0; animation: titleFadeIn 3s ease forwards 0.5s; position:relative; }
+#title::before, #title::after { content: attr(data-text); position:absolute; left:0; width:100%; color:#ff4444; clip:rect(0,0,0,0); }
+#title::before { animation: glitch1 2s infinite linear alternate-reverse; }
+#title::after { animation: glitch2 3s infinite linear alternate; }
+
+@keyframes glitch1 { 0%{clip:rect(0,9999px,0,0);transform:skew(0.5deg);} 20%{clip:rect(10px,9999px,50px,0);transform:skew(-0.5deg);} 40%{clip:rect(85px,9999px,140px,0);transform:skew(0.8deg);} 60%{clip:rect(50px,9999px,90px,0);transform:skew(-0.3deg);} 80%{clip:rect(30px,9999px,70px,0);transform:skew(0.4deg);} 100%{clip:rect(0,9999px,0,0);transform:skew(0deg);} }
+@keyframes glitch2 { 0%{clip:rect(0,9999px,0,0);transform:skew(0deg);} 25%{clip:rect(20px,9999px,60px,0);transform:skew(0.5deg);} 50%{clip:rect(70px,9999px,130px,0);transform:skew(-0.5deg);} 75%{clip:rect(40px,9999px,90px,0);transform:skew(0.3deg);} 100%{clip:rect(0,9999px,0,0);transform:skew(0deg);} }
+@keyframes titleFadeIn { to{opacity:1;} }
+
+/* Botón Comenzar pulsante */
+#start-btn { position:relative; margin-top:30px; z-index:20; background:transparent; border:2px solid #ff0000; color:#ff0000; padding:15px 50px; font-size:1.8em; cursor:pointer; text-transform:uppercase; letter-spacing:2px; transition: all 0.3s ease; pointer-events:auto; animation: pulseBtn 2s infinite; }
+#start-btn:hover { animation:none; box-shadow:0 0 25px #ff5555,0 0 50px #ff0000; transform: scale(1.1); }
+@keyframes pulseBtn { 0%,100%{box-shadow:0 0 15px #ff000055,0 0 25px #ff000033;} 50%{box-shadow:0 0 35px #ff5555,0 0 70px #ff0000;} }
+
+/* Menú principal */
+#menu { position:absolute; top:30%; left:50%; transform:translateX(-50%); text-align:center; opacity:0; transition:opacity 1.5s; z-index:15; }
+.menu-btn { display:block; margin:20px auto; padding:15px 50px; font-size:1.5em; border:2px solid #ff0000; color:#ff0000; background:transparent; cursor:pointer; transition: all 0.3s ease; text-transform:uppercase; letter-spacing:2px; }
+.menu-btn:hover { background:#ff000033; box-shadow:0 0 15px #ff000055; transform: scale(1.1); }
+
+/* Overlay reglas animado */
+#help-overlay { position:fixed; top:-100%; left:0; width:100%; height:100%; background:black; color:white; display:flex; flex-direction:column; justify-content:center; align-items:center; font-size:1.2em; text-align:center; padding:20px; opacity:1; transition:top 0.7s ease; z-index:20; }
+#help-overlay.active { top:0; }
+#help-overlay button { margin-top:20px; padding:10px 25px; font-size:1em; cursor:pointer; border:2px solid #ff0000; background:transparent; color:#ff0000; }
+#help-overlay button:hover { background:#ff000033; }
+</style>
+</head>
+<body>
+
+<div id="background">
+    <div class="fog"></div>
+    <div class="fog"></div>
+    <div class="fog"></div>
+</div>
+
+<canvas id="title-canvas"></canvas>
+
+<div id="title-container">
+    <h1 id="title" data-text="LCDM">LCDM</h1>
+    <button id="start-btn">Comenzar</button>
+</div>
+
+<div id="menu">
+    <button class="menu-btn" id="play-btn">Jugar</button>
+    <button class="menu-btn" id="help-btn">Global Ayuda</button>
+</div>
+
+<div id="help-overlay">
+    <div>
+        <h2>Reglas del Juego</h2>
+        <p>1. Explora el mapa sin morir.<br>
+           2. Sobrevive a los enemigos.<br>
+           3. Usa armas y objetos sabiamente.<br>
+           4. Puntaje basado en enemigos eliminados y misiones completadas.<br>
+        </p>
+        <button id="close-help">Cerrar</button>
+    </div>
+</div>
+
+<audio id="ambient" loop autoplay>
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5c3f9bca2f.mp3?filename=dark-ambient-113997.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+// Canvas partículas interactivas
+const canvas = document.getElementById('title-canvas');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+const ctx = canvas.getContext('2d');
+const particles = [];
+for(let i=0;i<100;i++){
+    particles.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height*0.4, size:Math.random()*4+1, alpha:Math.random()*0.5+0.3, speed:Math.random()*0.3+0.1});
+}
+document.addEventListener('mousemove', e=>{
+    particles.forEach(p=>{p.x += (e.clientX - p.x)*0.0005; p.y += (e.clientY - p.y)*0.0005;});
+});
+function animateParticles(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(255,50,50,${p.alpha})`;
+        ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+        ctx.fill();
+        p.y -= p.speed;
+        if(p.y < 0) p.y = canvas.height*0.4;
+    });
+    requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// Elementos
+const startBtn = document.getElementById('start-btn');
+const titleContainer = document.getElementById('title-container');
+const menu = document.getElementById('menu');
+const playBtn = document.getElementById('play-btn');
+const helpBtn = document.getElementById('help-btn');
+const helpOverlay = document.getElementById('help-overlay');
+const closeHelp = document.getElementById('close-help');
+const ambient = document.getElementById('ambient');
+
+// Susurros aleatorios
+function playRandomCreep(){
+  const sfx = new Audio('https://cdn.pixabay.com/download/audio/2022/03/16/audio_9c8b0a32c4.mp3?filename=eerie-whisper-113994.mp3');
+  sfx.volume = 0.3; sfx.play();
+}
+setInterval(playRandomCreep, 15000);
+
+// Inicio juego
+startBtn.addEventListener('click', ()=>{
+    titleContainer.style.opacity = 0;
+    setTimeout(()=>{ menu.style.opacity = 1; }, 1500);
+});
+
+// Menú
+playBtn.addEventListener('click', ()=>{ window.location.href = "game.html"; });
+helpBtn.addEventListener('click', ()=>{ helpOverlay.classList.add('active'); });
+closeHelp.addEventListener('click', ()=>{ helpOverlay.classList.remove('active'); });
+</script>
+
+</body>
+</html>

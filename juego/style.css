@@ -1,0 +1,34 @@
+#title-container {
+    position:absolute;
+    top:30%;
+    width:100%;
+    text-align:center;
+    pointer-events:none;
+    overflow:visible;
+    opacity:1;
+    transition:opacity 1.5s;
+    z-index:10; /* <- Asegura que esté arriba de todo */
+}
+
+#start-btn {
+    position:relative; /* relativo dentro del contenedor */
+    z-index:20;        /* <- Siempre encima del canvas y partículas */
+    bottom:0;
+    margin-top:30px;
+    background:transparent;
+    border:2px solid #ff0000;
+    color:#ff0000;
+    padding:15px 40px;
+    font-size:1.5em;
+    cursor:pointer;
+    text-transform:uppercase;
+    letter-spacing:2px;
+    transition: all 0.3s ease;
+    opacity:1; /* visible */
+}
+#start-btn:hover {
+    animation:shake 0.2s infinite;
+    background:#ff000033;
+    box-shadow:0 0 15px #ff000055;
+    transform: scale(1.1);
+}
