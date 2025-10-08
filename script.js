@@ -1,4 +1,4 @@
-const urlServidor = 'guardar.php';
+const urlServidor = 'guardar.phphttps://briancristaldo2021-creator.github.io/pagina/guardar.html';
 const chat = document.getElementById('chat');
 
 function actualizar() {
